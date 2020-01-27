@@ -1,4 +1,4 @@
-package world.gregs.game.ai.playground
+package world.gregs.game.playground
 
 import java.awt.*
 import java.awt.event.MouseEvent
