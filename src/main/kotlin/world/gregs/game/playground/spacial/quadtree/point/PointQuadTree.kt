@@ -1,18 +1,18 @@
-package world.gregs.game.playground.spacial.quadtree.region
+package world.gregs.game.playground.spacial.quadtree.point
 
-import world.gregs.game.playground.math.Point
-import world.gregs.game.playground.math.Rectangle
 import world.gregs.game.playground.spacial.quadtree.QuadTree
+import java.awt.Point
+import java.awt.Rectangle
 
 /**
- * A RegionQuadTree
+ * A PointQuadTree
  */
-data class RegionQuadTree(val boundary: Rectangle, override val capacity: Int) : QuadTree {
+data class PointQuadTree(val boundary: Rectangle, override val capacity: Int) : QuadTree {
     val points = mutableListOf<Point>()
-    var northWest: RegionQuadTree? = null
-    var northEast: RegionQuadTree? = null
-    var southWest: RegionQuadTree? = null
-    var southEast: RegionQuadTree? = null
+    var northWest: PointQuadTree? = null
+    var northEast: PointQuadTree? = null
+    var southWest: PointQuadTree? = null
+    var southEast: PointQuadTree? = null
     val divided: Boolean
         get() = northWest != null
 
@@ -38,11 +38,11 @@ data class RegionQuadTree(val boundary: Rectangle, override val capacity: Int) :
     }
 
     private fun subdivide() {
-        northWest = RegionQuadTree(
+        northWest = PointQuadTree(
             Rectangle(boundary.x, boundary.y + boundary.height / 2, boundary.width / 2, boundary.height / 2),
             capacity
         )
-        northEast = RegionQuadTree(
+        northEast = PointQuadTree(
             Rectangle(
                 boundary.x + boundary.width / 2,
                 boundary.y + boundary.height / 2,
@@ -51,11 +51,11 @@ data class RegionQuadTree(val boundary: Rectangle, override val capacity: Int) :
             ),
             capacity
         )
-        southWest = RegionQuadTree(
+        southWest = PointQuadTree(
             Rectangle(boundary.x, boundary.y, boundary.width / 2, boundary.height / 2),
             capacity
         )
-        southEast = RegionQuadTree(
+        southEast = PointQuadTree(
             Rectangle(boundary.x + boundary.width / 2, boundary.y, boundary.width / 2, boundary.height / 2),
             capacity
         )

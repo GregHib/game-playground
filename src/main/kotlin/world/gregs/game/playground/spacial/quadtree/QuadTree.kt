@@ -1,7 +1,7 @@
 package world.gregs.game.playground.spacial.quadtree
 
-import world.gregs.game.playground.math.Point
-import world.gregs.game.playground.math.Rectangle
+import java.awt.Point
+import java.awt.Rectangle
 
 interface QuadTree {
     /**

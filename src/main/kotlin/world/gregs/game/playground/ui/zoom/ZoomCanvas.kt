@@ -57,7 +57,7 @@ class ZoomCanvas(paddingX: Double, paddingY: Double, minZoom: Double, maxZoom: D
         content.addEventFilter(MouseEvent.MOUSE_DRAGGED, gestures.onMouseMovedEventHandler)
         content.addEventFilter(MouseEvent.MOUSE_PRESSED, gestures.onMousePressedEventHandler)
         content.addEventFilter(MouseEvent.MOUSE_DRAGGED, gestures.onMouseDraggedEventHandler)
-        content.addEventFilter(ScrollEvent.ANY, gestures.onScrollEventHandler)
+        addEventFilter(ScrollEvent.ANY, gestures.onScrollEventHandler)
 
         primaryStage.addEventFilter(KeyEvent.KEY_PRESSED, gestures.onKeyPressedEventHandler)
         primaryStage.addEventFilter(KeyEvent.KEY_RELEASED, gestures.onKeyReleasedEventHandler)
