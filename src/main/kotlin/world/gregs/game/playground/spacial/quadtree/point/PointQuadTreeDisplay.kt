@@ -1,12 +1,13 @@
-package world.gregs.game.playground.spacial.quadtree.region
+package world.gregs.game.playground.spacial.quadtree.point
 
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import tornadofx.*
-import world.gregs.game.playground.math.Point
-import world.gregs.game.playground.math.Rectangle
-import world.gregs.game.playground.ui.Styles
+import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.zoom
+import java.awt.Point
+import java.awt.Rectangle
+import kotlin.random.Random
 
 /**
  * A basic interactive quadtree
@@ -16,7 +17,7 @@ import world.gregs.game.playground.ui.zoom.zoom
  *      click/drag to insert point(s)
  *      selection moves with mouse movement
  */
-class RegionQuadTreeView : View("QuadTree") {
+class PointQuadTreeView : View("PointQuadTree") {
 
     companion object {
         // Size must be power of two for this rendering, however not a quadtree requirement
@@ -28,7 +29,7 @@ class RegionQuadTreeView : View("QuadTree") {
         const val CAPACITY = 1
     }
 
-    private val quadTree = RegionQuadTree(
+    private val quadTree = PointQuadTree(
         boundary,
         CAPACITY
     )
@@ -42,14 +43,15 @@ class RegionQuadTreeView : View("QuadTree") {
 
     init {
         repeat(POINTS) {
-            quadTree.insert(boundary.randomPoint())
+            quadTree.insert(Point(Random.nextInt(boundary.width), Random.nextInt(
+                boundary.height)))
         }
     }
 
     /**
      * Renders the quad tree grid recursively
      */
-    private fun RegionQuadTree.showGrid() {
+    private fun PointQuadTree.showGrid() {
         boundary.drawCentreLines()
         if (divided) {
             northWest!!.showGrid()
@@ -75,7 +77,7 @@ class RegionQuadTreeView : View("QuadTree") {
     /**
      * Renders all quad tree points recursively, highlighting [results]
      */
-    private fun RegionQuadTree.showPoints(results: List<Point>) {
+    private fun PointQuadTree.showPoints(results: List<Point>) {
         points.forEach { point ->
             content.circle(point.x, point.y, 1) {
                 fill = if (results.contains(point)) Color.LIMEGREEN else Color.HOTPINK
@@ -110,7 +112,7 @@ class RegionQuadTreeView : View("QuadTree") {
         PADDING, 1.0, 10.0) {
         prefWidth = boundary.width + PADDING
         prefHeight = boundary.height + PADDING
-        this@RegionQuadTreeView.content = content
+        this@PointQuadTreeView.content = content
 
         reload()
 
@@ -138,7 +140,10 @@ class RegionQuadTreeView : View("QuadTree") {
             var y = it.y.toInt() - selection.height / 2
             x = x.coerceIn(boundary.x, boundary.x + boundary.width - selection.width)
             y = y.coerceIn(boundary.y, boundary.y + boundary.height - selection.height)
-            selection = selection.copy(x = x, y = y)
+            selection = Rectangle(x, y,
+                WIDTH,
+                HEIGHT
+            )
             reload()
         }
     }
@@ -157,8 +162,8 @@ class RegionQuadTreeView : View("QuadTree") {
     }
 }
 
-class RegionQuadTreeApp : App(RegionQuadTreeView::class, Styles::class)
+class PointQuadTreeApp : App(PointQuadTreeView::class, QuadTreeStyles::class)
 
 fun main(args: Array<String>) {
-    launch<RegionQuadTreeApp>(*args)
+    launch<PointQuadTreeApp>(*args)
 }
