@@ -4,11 +4,7 @@ import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.*
-import kotlin.math.abs
 import kotlin.math.round
-import kotlin.math.sqrt
-
-typealias Distance = (x1: Int, y1: Int, x2: Int, y2: Int) -> Double
 
 class InfluenceGrid {
 
@@ -88,10 +84,9 @@ class InfluenceGrid {
 
     val maxDistance = 10.0
 
-    val manhattan: Distance = { x1, y1, x2, y2 -> (abs(x1 - x2) + abs(y1 - y2)).toDouble() }//Diamond
-    val chebyshev: Distance = { x1, y1, x2, y2 -> abs(x1 - x2).coerceAtLeast(abs(y1 - y2)).toDouble() }//Square
-    val euclidean: Distance = { x1, y1, x2, y2 -> sqrt(((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).toDouble()) }//Circle
-
+//    manhattan - diamond
+//    chebyshev - square
+//    euclidean - circle
     val predicate: (x1: Int, y1: Int, x2: Int, y2: Int) -> Double = euclidean
 
     init {
