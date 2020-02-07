@@ -13,10 +13,11 @@ import tornadofx.addClass
 import tornadofx.opcr
 import world.gregs.game.playground.ui.Styles
 
+
 /**
  * A canvas which can be scaled
  */
-class ZoomCanvas(paddingX: Double, paddingY: Double, minZoom: Double, maxZoom: Double) : Pane() {
+open class ZoomCanvas(paddingX: Double, paddingY: Double, minZoom: Double, maxZoom: Double) : Pane() {
 
     private var canvasScale = SimpleDoubleProperty(1.0)
 
