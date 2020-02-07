@@ -1,4 +1,4 @@
-package world.gregs.game.playground.pathfinding.bfs
+package world.gregs.game.playground.pathfinding.floodfill
 
 import javafx.scene.paint.Color
 import tornadofx.App
@@ -6,12 +6,13 @@ import tornadofx.View
 import tornadofx.launch
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
+import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
 import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 import kotlin.random.Random
 
-class BreadthFirstSearchView : View("Breadth first search") {
+class FloodFillView : View("Flood fill") {
 
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
@@ -19,7 +20,7 @@ class BreadthFirstSearchView : View("Breadth first search") {
     }
 
     private lateinit var start: Node
-    private val bfs = BreadthFirstSearch(Direction.values())
+    private val bfs = BreadthFirstSearch(Direction.cardinal)
 
     override val root = grid(16, 16, PADDING, PADDING) {
         prefWidth = boundary.width + PADDING
@@ -51,8 +52,8 @@ class BreadthFirstSearchView : View("Breadth first search") {
     }
 }
 
-class BreadthFirstSearchApp : App(BreadthFirstSearchView::class, QuadTreeStyles::class)
+class FloodFillApp : App(FloodFillView::class, QuadTreeStyles::class)
 
 fun main(args: Array<String>) {
-    launch<BreadthFirstSearchApp>(*args)
+    launch<FloodFillApp>(*args)
 }

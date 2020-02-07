@@ -7,6 +7,7 @@ import tornadofx.clear
 import tornadofx.line
 import tornadofx.opcr
 import tornadofx.rectangle
+import world.gregs.game.playground.Grid
 
 class GridCanvas(
     val columns: Int,
@@ -17,6 +18,7 @@ class GridCanvas(
     maxZoom: Double
 ) : ZoomCanvas(paddingX, paddingY, minZoom, maxZoom) {
 
+    val grid = Grid(columns, rows)
     lateinit var background: Rectangle
 
     var width: Int = 0
@@ -39,15 +41,29 @@ class GridCanvas(
             fill = Color.WHITE
         }
 
+        // vertical lines
         for (x in tileWidth until width step tileWidth) {
             content.line(x, 0.5, x, height - 0.5) {
                 stroke = Color.BLACK
             }
         }
 
+        // horizontal lines
         for (y in tileHeight until height step tileHeight) {
             content.line(0.5, y, width - 0.5, y) {
                 stroke = Color.BLACK
+            }
+        }
+
+        // tiles
+        for (x in 0 until columns) {
+            for (y in 0 until rows) {
+                val tile = grid.blocked(x, y)
+                if (tile) {
+                    tile(x, y) {
+                        fill = Color.BLACK
+                    }
+                }
             }
         }
     }
@@ -75,7 +91,7 @@ fun EventTarget.grid(
     rows: Int,
     paddingX: Double,
     paddingY: Double,
-    minZoom: Double,
-    maxZoom: Double,
+    minZoom: Double = 1.0,
+    maxZoom: Double = 10.0,
     op: GridCanvas.() -> Unit = {}
 ) = opcr(this, GridCanvas(columns, rows, paddingX, paddingY, minZoom, maxZoom), op)
