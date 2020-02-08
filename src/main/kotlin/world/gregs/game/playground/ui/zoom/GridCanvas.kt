@@ -2,6 +2,7 @@ package world.gregs.game.playground.ui.zoom
 
 import javafx.event.EventTarget
 import javafx.scene.paint.Color
+import javafx.scene.shape.Line
 import javafx.scene.shape.Rectangle
 import tornadofx.clear
 import tornadofx.line
@@ -81,7 +82,15 @@ class GridCanvas(
     fun yToGrid(y: Int) = height - y
 
     fun tile(x: Int, y: Int, width: Int = 1, height: Int = 1, op: Rectangle.() -> Unit = {}) {
-        content.rectangle(x * tileWidth, yToGrid((y + height) * tileHeight), width * tileWidth, height * tileHeight, op)
+        content.rectangle(gridToX(x), gridToY(y + height), width * tileWidth, height * tileHeight, op)
+    }
+
+    fun tileLine(startX: Int, startY: Int, endX: Int, endY: Int, op: Line.() -> Unit = {}) {
+        content.line(gridToX(startX + 0.5), gridToY(startY + 0.5), gridToX(endX + 0.5), gridToY(endY + 0.5), op)
+    }
+
+    fun line(startX: Int, startY: Int, endX: Int, endY: Int, op: Line.() -> Unit = {}) {
+        content.line(gridToX(startX), gridToY(startY), gridToX(endX), gridToY(endY), op)
     }
 
 }
