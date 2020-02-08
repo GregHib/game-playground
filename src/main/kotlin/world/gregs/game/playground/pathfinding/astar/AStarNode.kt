@@ -20,14 +20,14 @@ class AStarNode(
 
     companion object {
 
-        var LURDMoves = arrayOf(
+        var LURD_MOVES = arrayOf(
             intArrayOf(-1, 0),
             intArrayOf(0, -1),
             intArrayOf(1, 0),
             intArrayOf(0, 1)
         )
 
-        var diagonalMoves = arrayOf(
+        var DIAGONAL_MOVES = arrayOf(
             intArrayOf(-1, -1),
             intArrayOf(1, -1),
             intArrayOf(1, 1),
@@ -35,7 +35,7 @@ class AStarNode(
         )
         //references to the LURDMoves entries that would block the diagonal
         //if they are both walls and canPassThroughCorners = false
-        var DiagonalBlockers = arrayOf(
+        var DIAGONAL_BLOCKERS = arrayOf(
             intArrayOf(0, 1),
             intArrayOf(1, 2),
             intArrayOf(2, 3),
@@ -46,7 +46,7 @@ class AStarNode(
     fun addNeighbors(grid: Array<Array<AStarNode>>) {
         // Left/up/right/down
         for (i in 0 until 4) {
-            val node = grid.getOrNull(x + LURDMoves[i][0])?.getOrNull(y + LURDMoves[i][1])
+            val node = grid.getOrNull(x + LURD_MOVES[i][0])?.getOrNull(y + LURD_MOVES[i][1])
             if (node != null) {
                 if(!node.wall) {
                     neighbors.add(node)
@@ -58,21 +58,21 @@ class AStarNode(
 
         // Diagonals
         for (i in 0 until 4) {
-            val gridX = x + diagonalMoves[i][0]
-            val gridY = y + diagonalMoves[i][1]
+            val gridX = x + DIAGONAL_MOVES[i][0]
+            val gridY = y + DIAGONAL_MOVES[i][1]
 
             val node = grid.getOrNull(gridX)?.getOrNull(gridY)
             if (node != null) {
                 if (allowDiagonals && !node.wall) {
                     if (!canPassThroughCorners) {
                         // Check if blocked by surrounding walls
-                        val border1 = DiagonalBlockers[i][0]
-                        val border2 = DiagonalBlockers[i][1]
+                        val border1 = DIAGONAL_BLOCKERS[i][0]
+                        val border2 = DIAGONAL_BLOCKERS[i][1]
 
                         // No need to protect against OOB as diagonal move
                         // check ensures that blocker refs must be valid
-                        val blocker1 = grid[x + LURDMoves[border1][0]][y + LURDMoves[border1][1]]
-                        val blocker2 = grid[x + LURDMoves[border2][0]][y + LURDMoves[border2][1]]
+                        val blocker1 = grid[x + LURD_MOVES[border1][0]][y + LURD_MOVES[border1][1]]
+                        val blocker2 = grid[x + LURD_MOVES[border2][0]][y + LURD_MOVES[border2][1]]
                         if (!blocker1.wall || !blocker2.wall) {
                             // one or both are open so we can move past
                             neighbors.add(node)
