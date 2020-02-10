@@ -1,5 +1,6 @@
-package world.gregs.game.playground.pathfinding.astar
+package world.gregs.game.playground.pathfinding.astar.impl
 
+import world.gregs.game.playground.Grid
 import world.gregs.game.playground.pathfinding.astar.AStarView.Companion.allowDiagonals
 import world.gregs.game.playground.pathfinding.astar.AStarView.Companion.canPassThroughCorners
 import java.awt.Point
@@ -43,10 +44,10 @@ class AStarNode(
         )
     }
 
-    fun addNeighbors(grid: Array<Array<AStarNode>>) {
+    fun addNeighbors(grid: Grid<AStarNode>) {
         // Left/up/right/down
         for (i in 0 until 4) {
-            val node = grid.getOrNull(x + LURD_MOVES[i][0])?.getOrNull(y + LURD_MOVES[i][1])
+            val node = grid.get(x + LURD_MOVES[i][0], y + LURD_MOVES[i][1])
             if (node != null) {
                 if(!node.wall) {
                     neighbors.add(node)
@@ -61,7 +62,7 @@ class AStarNode(
             val gridX = x + DIAGONAL_MOVES[i][0]
             val gridY = y + DIAGONAL_MOVES[i][1]
 
-            val node = grid.getOrNull(gridX)?.getOrNull(gridY)
+            val node = grid.get(gridX, gridY)
             if (node != null) {
                 if (allowDiagonals && !node.wall) {
                     if (!canPassThroughCorners) {
@@ -71,9 +72,9 @@ class AStarNode(
 
                         // No need to protect against OOB as diagonal move
                         // check ensures that blocker refs must be valid
-                        val blocker1 = grid[x + LURD_MOVES[border1][0]][y + LURD_MOVES[border1][1]]
-                        val blocker2 = grid[x + LURD_MOVES[border2][0]][y + LURD_MOVES[border2][1]]
-                        if (!blocker1.wall || !blocker2.wall) {
+                        val blocker1 = grid.get(x + LURD_MOVES[border1][0], y + LURD_MOVES[border1][1])
+                        val blocker2 = grid.get(x + LURD_MOVES[border2][0], y + LURD_MOVES[border2][1])
+                        if (blocker1?.wall == false || blocker2?.wall == false) {
                             // one or both are open so we can move past
                             neighbors.add(node)
                         }
@@ -82,7 +83,7 @@ class AStarNode(
                     }
                 }
                 if (node.wall) {
-                    this.neighboringWalls.push(node);
+                    this.neighboringWalls.push(node)
                 }
             }
         }

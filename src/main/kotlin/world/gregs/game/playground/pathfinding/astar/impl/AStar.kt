@@ -1,38 +1,37 @@
-package world.gregs.game.playground.pathfinding.astar
+package world.gregs.game.playground.pathfinding.astar.impl
 
+import world.gregs.game.playground.Grid
 import world.gregs.game.playground.manhattan
 import world.gregs.game.playground.pathfinding.astar.AStarView.Companion.allowDiagonals
 import java.util.*
 import kotlin.random.Random
 
-class AStar(cols: Int, rows: Int) {
-    val grid = Array(cols) { x -> Array(rows) { y -> AStarNode(x, y) } }
+class AStar(private val grid: Grid<AStarNode>) {
     val openSet = LinkedList<AStarNode>()
     val closedSet = LinkedList<AStarNode>()
     val path = mutableListOf<AStarNode>()
 
-    private val start = grid[0][0]
-    private val end = grid[cols - 1][rows - 1]
+    var start = grid.get(0, 0)!!
+    var end = grid.get(grid.columns - 1, grid.rows - 1)!!
     var complete = false
 
     init {
-        for (x in grid.indices) {
-            for (y in grid[0].indices) {
-                grid[x][y].addNeighbors(grid)
+        for (x in grid.colIndices) {
+            for (y in grid.rowIndices) {
+                grid.get(x, y)?.addNeighbors(grid)
             }
         }
         reset()
-        randomMap()
-    }
-
-    fun randomMap() {
-        for (x in grid.indices) {
-            for (y in grid[0].indices) {
-                grid[x][y].wall = Random.nextDouble() < AStarView.WALL_PERCENT
-            }
-        }
         start.wall = false
         end.wall = false
+    }
+
+    fun randomMap(percent: Double) {
+        for (x in grid.colIndices) {
+            for (y in grid.rowIndices) {
+                grid.get(x, y)?.wall = Random.nextDouble() < percent
+            }
+        }
     }
 
     fun reset() {
@@ -40,11 +39,9 @@ class AStar(cols: Int, rows: Int) {
         openSet.clear()
         closedSet.clear()
 
-        openSet.push(start)
-
-        for (x in grid.indices) {
-            for (y in grid[0].indices) {
-                grid[x][y].apply {
+        for (x in grid.colIndices) {
+            for (y in grid.rowIndices) {
+                grid.get(x, y)?.apply {
                     f = 0.0
                     g = 0.0
                     vh = 0.0
@@ -53,6 +50,10 @@ class AStar(cols: Int, rows: Int) {
             }
         }
         complete = false
+    }
+
+    fun start() {
+        openSet.push(start)
     }
 
     fun loop() {
