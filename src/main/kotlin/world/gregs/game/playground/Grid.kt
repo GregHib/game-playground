@@ -1,29 +1,38 @@
 package world.gregs.game.playground
 
-import java.util.*
-import kotlin.random.Random
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
+import java.security.SecureRandom
 
-class Grid(val columns: Int, val rows: Int) {
-    private val tiles = Array(columns) { Array(rows) { false } }
+open class Grid<T>(val columns: Int, val rows: Int) {
 
-    fun blocked(x: Int, y: Int, default: Boolean = true): Boolean = tiles.getOrNull(x)?.getOrNull(y) ?: default
+    private val grid = Long2ObjectOpenHashMap<T>(columns * rows)
+    private val keys: LongArray = LongArray(columns.coerceAtLeast(rows) * columns.coerceAtLeast(rows))
+    private val rand = SecureRandom()
 
-    fun set(x: Int, y: Int, value: Boolean) {
-        tiles[x][y] = value
+    val colIndices = 0 until columns
+    val rowIndices = 0 until rows
+
+    fun set(x: Int, y: Int, value: T) {
+        val hash = hash(x, y)
+        keys[y * rows + x] = hash
+        grid[hash] = value
+    }
+
+    fun get(x: Int, y: Int): T? {
+        return if (x in colIndices && y in rowIndices) grid[keys[y * rows + x]] else null
+    }
+
+    private fun hash(x: Int, y: Int): Long {
+        var hash = rand.nextLong()
+
+        hash = hash xor x.toLong()
+        hash = hash xor y.toLong()
+
+        return hash
     }
 
     fun clear() {
-        tiles.forEach { Arrays.fill(it, false) }
-    }
-
-    fun fillRandom(percent: Double) {
-        check(percent <= 1) { "Percentage must be between 0-1"}
-        check(percent > 0) { "Percentage must be between 0-1" }
-        clear()
-        for (x in 0 until columns) {
-            for (y in 0 until rows) {
-                set(x, y, Random.nextDouble() < percent)
-            }
-        }
+        grid.clear()
+        keys.fill(0)
     }
 }

@@ -1,14 +1,6 @@
 package world.gregs.game.playground
 
-import org.openjdk.jmh.annotations.*
-import org.openjdk.jmh.infra.Blackhole
-import world.gregs.game.playground.spacial.quadtree.QuadTree
-import world.gregs.game.playground.spacial.quadtree.point.PointQuadTree
-import java.awt.Point
-import java.awt.Rectangle
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
-
+/*
 @BenchmarkMode(Mode.AverageTime)
 @State(Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -40,4 +32,4 @@ class QuadTreeInsertBenchmark {
         }
         return quadTree
     }
-}
+}*/
