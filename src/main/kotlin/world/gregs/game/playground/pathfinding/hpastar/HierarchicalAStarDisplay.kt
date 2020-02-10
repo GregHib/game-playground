@@ -4,8 +4,8 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import tornadofx.*
+import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.Direction
-import world.gregs.game.playground.Grid
 import world.gregs.game.playground.Node
 import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
 import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
@@ -29,7 +29,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
     private val bfs = BreadthFirstSearch(Direction.cardinal)
     private val interedges = Array(COLUMNS) { Array(ROWS) { false } }
 
-    fun setup(grid: Grid) {
+    fun setup(grid: BooleanGrid) {
         grid.set(1, 1, true)
         grid.set(2, 1, true)
         grid.set(4, 2, true)
@@ -120,7 +120,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
     }
 
     private fun showLinks() {
-        val grid = Grid(CLUSTER_SIZE, CLUSTER_SIZE)
+        val grid = BooleanGrid(CLUSTER_SIZE, CLUSTER_SIZE)
         for (clusterX in 0 until root.grid.columns step CLUSTER_SIZE) {
             for (clusterY in 0 until root.grid.rows step CLUSTER_SIZE) {
                 grid.clear()

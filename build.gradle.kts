@@ -22,6 +22,7 @@ dependencies {
     implementation("ch.ethz.globis.phtree:phtree:2.4.0")
     implementation("org.jgrapht:jgrapht-core:1.3.1")
     implementation("org.jgrapht:jgrapht-ext:1.3.1")
+    implementation("it.unimi.dsi:fastutil:8.3.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("io.mockk:mockk:1.9.3")

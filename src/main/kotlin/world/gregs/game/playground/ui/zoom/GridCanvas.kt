@@ -8,18 +8,19 @@ import tornadofx.clear
 import tornadofx.line
 import tornadofx.opcr
 import tornadofx.rectangle
+import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.Grid
 
-class GridCanvas(
-    val columns: Int,
-    val rows: Int,
+class GridCanvas<T : Any, G : Grid<T>>(
+    val grid: G,
     paddingX: Double,
     paddingY: Double,
     minZoom: Double,
     maxZoom: Double
 ) : ZoomCanvas(paddingX, paddingY, minZoom, maxZoom) {
 
-    val grid = Grid(columns, rows)
+    val columns: Int = grid.columns
+    val rows: Int = grid.rows
     lateinit var background: Rectangle
 
     var width: Int = 0
@@ -57,12 +58,13 @@ class GridCanvas(
         }
 
         // tiles
-        for (x in 0 until columns) {
-            for (y in 0 until rows) {
-                val tile = grid.blocked(x, y)
-                if (tile) {
-                    tile(x, y) {
-                        fill = Color.BLACK
+        if(grid is SolidGrid) {
+            for (x in 0 until columns) {
+                for (y in 0 until rows) {
+                    if (grid.blocked(x, y)) {
+                        tile(x, y) {
+                            fill = Color.BLACK
+                        }
                     }
                 }
             }
@@ -102,5 +104,14 @@ fun EventTarget.grid(
     paddingY: Double,
     minZoom: Double = 1.0,
     maxZoom: Double = 10.0,
-    op: GridCanvas.() -> Unit = {}
-) = opcr(this, GridCanvas(columns, rows, paddingX, paddingY, minZoom, maxZoom), op)
+    op: GridCanvas<Boolean, BooleanGrid>.() -> Unit = {}
+) = opcr(this, GridCanvas(BooleanGrid(columns, rows), paddingX, paddingY, minZoom, maxZoom), op)
+
+fun <T : Any> EventTarget.grid(
+    grid: Grid<T>,
+    paddingX: Double,
+    paddingY: Double,
+    minZoom: Double = 1.0,
+    maxZoom: Double = 10.0,
+    op: GridCanvas<T, Grid<T>>.() -> Unit = {}
+) = opcr(this, GridCanvas(grid, paddingX, paddingY, minZoom, maxZoom), op)
