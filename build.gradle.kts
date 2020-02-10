@@ -19,6 +19,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("no.tornado:tornadofx:2.0.0-SNAPSHOT")
+    implementation("ch.ethz.globis.phtree:phtree:2.4.0")
+    implementation("org.jgrapht:jgrapht-core:1.3.1")
+    implementation("org.jgrapht:jgrapht-ext:1.3.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("io.mockk:mockk:1.9.3")
