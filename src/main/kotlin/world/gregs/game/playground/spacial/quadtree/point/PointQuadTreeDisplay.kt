@@ -52,8 +52,8 @@ class PointQuadTreeView : View("PointQuadTree") {
      * Renders the quad tree grid recursively
      */
     private fun PointQuadTree.showGrid() {
-        boundary.drawCentreLines()
         if (divided) {
+            boundary.drawCentreLines()
             northWest!!.showGrid()
             northEast!!.showGrid()
             southWest!!.showGrid()

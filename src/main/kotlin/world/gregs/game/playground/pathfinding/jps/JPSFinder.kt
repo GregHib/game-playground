@@ -150,20 +150,20 @@ class JPSFinder {
         if (dx != 0 && dy != 0) {
             // diagonal movement
             if (!map.blocked(x + dx, y))
-                neighbours.add(map!!.get(x + dx, y))
+                neighbours.add(map.get(x + dx, y))
 
             if (!map.blocked(x, y + dy))
-                neighbours.add(map!!.get(x, y + dy))
+                neighbours.add(map.get(x, y + dy))
 
             if (!map.blocked(x + dx, y + dy))
-                neighbours.add(map!!.get(x + dx, y + dy))
+                neighbours.add(map.get(x + dx, y + dy))
 
             if (MOVING_THROUGH_WALL_CORNERS) {
                 if (map.blocked(x - dx, y))
-                    neighbours.add(map!!.get(x - dx, y + dy))
+                    neighbours.add(map.get(x - dx, y + dy))
 
                 if (map.blocked(x, y - dy))
-                    neighbours.add(map!!.get(x + dx, y - dy))
+                    neighbours.add(map.get(x + dx, y - dy))
             }
 
         } else {
@@ -171,48 +171,48 @@ class JPSFinder {
             if (dx == 0) {
                 // Add node right in front of direction
                 if (!map.blocked(x, y + dy)) {
-                    neighbours.add(map!!.get(x, y + dy))
+                    neighbours.add(map.get(x, y + dy))
                 }
                 // Pruning changes if corner crossing is allowed
                 if (!MOVING_THROUGH_WALL_CORNERS) {
                     if (map.blocked(x - 1, y - dy)) {
-                        neighbours.add(map!!.get(x - 1, y))
-                        neighbours.add(map!!.get(x - 1, y + dy))
+                        neighbours.add(map.get(x - 1, y))
+                        neighbours.add(map.get(x - 1, y + dy))
                     }
                     if (map.blocked(x + 1, y - dy)) {
-                        neighbours.add(map!!.get(x + 1, y))
-                        neighbours.add(map!!.get(x + 1, y + dy))
+                        neighbours.add(map.get(x + 1, y))
+                        neighbours.add(map.get(x + 1, y + dy))
                     }
                 } else {
                     if (map.blocked(x - 1, y)) {
-                        neighbours.add(map!!.get(x - 1, y + dy))
+                        neighbours.add(map.get(x - 1, y + dy))
                     }
                     if (map.blocked(x + 1, y)) {
-                        neighbours.add(map!!.get(x + 1, y + dy))
+                        neighbours.add(map.get(x + 1, y + dy))
                     }
                 }
                 // horizontal
             } else {
                 // Add node right in front of direction
                 if (!map.blocked(x + dx, y)) {
-                    neighbours.add(map!!.get(x + dx, y))
+                    neighbours.add(map.get(x + dx, y))
                 }
                 // Pruning changes if corner crossing is allowed or not
                 if (!MOVING_THROUGH_WALL_CORNERS) {
                     if (map.blocked(x - dx, y - 1)) {
-                        neighbours.add(map!!.get(x, y - 1))
-                        neighbours.add(map!!.get(x + dx, y - 1))
+                        neighbours.add(map.get(x, y - 1))
+                        neighbours.add(map.get(x + dx, y - 1))
                     }
                     if (map.blocked(x - dx, y + 1)) {
-                        neighbours.add(map!!.get(x, y + 1))
-                        neighbours.add(map!!.get(x + dx, y + 1))
+                        neighbours.add(map.get(x, y + 1))
+                        neighbours.add(map.get(x + dx, y + 1))
                     }
                 } else {
                     if (map.blocked(x, y - 1)) {
-                        neighbours.add(map!!.get(x + dx, y - 1))
+                        neighbours.add(map.get(x + dx, y - 1))
                     }
                     if (map.blocked(x, y + 1)) {
-                        neighbours.add(map!!.get(x + dx, y + 1))
+                        neighbours.add(map.get(x + dx, y + 1))
                     }
                 }
             }
@@ -263,11 +263,7 @@ class JPSFinder {
         // Horizontal
         if (dy == 0) {
             if (!MOVING_THROUGH_WALL_CORNERS) {
-                if (!map.blocked(x, y - 1) && map.blocked(x - dx, y - 1) || !map.blocked(
-                        x,
-                        y + 1
-                    ) && map.blocked(x - dx, y + 1)
-                )
+                if (!map.blocked(x, y - 1) && map.blocked(x - dx, y - 1) || !map.blocked(x, y + 1) && map.blocked(x - dx, y + 1))
                     return node
             } else {
                 if (!map.blocked(x + dx, y - 1) && map.blocked(x, y - 1) || !map.blocked(
@@ -327,7 +323,7 @@ class JPSFinder {
 
     companion object {
 
-        const val MOVING_THROUGH_WALL_CORNERS = true
+        const val MOVING_THROUGH_WALL_CORNERS = false
         val octile: (Node) -> Double = { d -> Math.max(d.x, d.y) + (Math.sqrt(2.0) - 1) * Math.min(d.x, d.y) }
     }
 
