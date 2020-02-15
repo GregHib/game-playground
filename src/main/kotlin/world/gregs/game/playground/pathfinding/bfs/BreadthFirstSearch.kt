@@ -38,7 +38,7 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
             directions.forEach { direction ->
                 val x = parent.x + direction.x
                 val y = parent.y + direction.y
-                if(!(grid as SolidGrid).blocked(x, y) && distances[x][y] == -1) {
+                if(x in grid.colIndices && y in grid.rowIndices && !(grid as SolidGrid).blocked(x, y) && distances[x][y] == -1) {
                     val distance = distances[parent.x][parent.y] + 1
                     distances[x][y] = distance
                     queue.add(Node(x, y))

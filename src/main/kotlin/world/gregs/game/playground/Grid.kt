@@ -14,12 +14,14 @@ open class Grid<T>(val columns: Int, val rows: Int) {
 
     fun set(x: Int, y: Int, value: T) {
         val hash = hash(x, y)
-        keys[y * rows + x] = hash
+        keys[x * rows + y] = hash
         grid[hash] = value
     }
 
+    fun inBounds(x: Int, y: Int) = x in colIndices && y in rowIndices
+
     fun get(x: Int, y: Int): T? {
-        return if (x in colIndices && y in rowIndices) grid[keys[y * rows + x]] else null
+        return if (x in colIndices && y in rowIndices) grid[keys[x * rows + y]] else null
     }
 
     private fun hash(x: Int, y: Int): Long {

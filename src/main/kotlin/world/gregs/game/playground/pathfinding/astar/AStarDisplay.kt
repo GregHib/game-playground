@@ -13,6 +13,7 @@ import world.gregs.game.playground.Grid
 import world.gregs.game.playground.pathfinding.astar.impl.AStar
 import world.gregs.game.playground.pathfinding.astar.impl.AStarNode
 import world.gregs.game.playground.pathfinding.astar.impl2.AStar2
+import world.gregs.game.playground.pathfinding.astar.impl3.AStar3
 import world.gregs.game.playground.pathfinding.jps.Result
 import world.gregs.game.playground.pathfinding.jps.node.JPSNode2
 import world.gregs.game.playground.pathfinding.jps.node.NodeState
@@ -157,7 +158,7 @@ class AStarView : View("AStar") {
 
             val start = grid.get(aStar.start.x, aStar.start.y)!!
             val end = grid.get(aStar.end.x, aStar.end.y)!!
-            result = AStar2().findPath(grid, start, end, AStar2.manhattan, 1.0)
+            result = AStar3().findPath(grid, start, end, AStar2.manhattan, 1.0)
 
 
             GlobalScope.launch(Dispatchers.JavaFx) {

@@ -9,6 +9,7 @@ import world.gregs.game.playground.Grid
 import world.gregs.game.playground.pathfinding.astar.impl.AStar
 import world.gregs.game.playground.pathfinding.astar.impl.AStarNode
 import world.gregs.game.playground.pathfinding.astar.impl2.AStar2
+import world.gregs.game.playground.pathfinding.astar.impl3.AStar3
 import world.gregs.game.playground.pathfinding.jps.node.JPSNode2
 import world.gregs.game.playground.pathfinding.jps.node.NodeState
 import world.gregs.game.playground.pathfinding.jps.node.NodeStatus
@@ -26,10 +27,10 @@ import java.awt.Rectangle
 class AStarJPSView : View("AStar") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
+        private val boundary = Rectangle(0, 0, 1024, 1024)
         const val PADDING = 100.0
-        const val COLUMNS = 24
-        const val ROWS = 24
+        const val COLUMNS = 2400
+        const val ROWS = 2400
         const val WALL_PERCENT = 0.2
         const val canPassThroughCorners = true
         const val allowDiagonals = true
@@ -104,7 +105,7 @@ class AStarJPSView : View("AStar") {
      */
     private fun reload() {
         content.clear()
-        showGrid()
+//        showGrid()
     }
 
     override val root = grid(grid,
@@ -155,7 +156,7 @@ class AStarJPSView : View("AStar") {
             }
             println()
             println("JPS took ${jpsResult?.duration()}ns ${jpsResult?.operations()} ops")
-            astarResult = AStar2().findPath(grid, start, end, AStar2.manhattan, 1.0)//Green
+            astarResult = AStar3().findPath(grid, start, end, AStar2.manhattan, 1.0)//Green
             println("A* #2 took ${astarResult?.duration()}ns ${astarResult?.operations()} ops")
             var operations = 0
             aStar.start()//Blue

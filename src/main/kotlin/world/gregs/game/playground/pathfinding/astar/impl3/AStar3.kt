@@ -1,4 +1,4 @@
-package world.gregs.game.playground.pathfinding.astar.impl2
+package world.gregs.game.playground.pathfinding.astar.impl3
 
 import world.gregs.game.playground.Grid
 import world.gregs.game.playground.Node
@@ -11,24 +11,33 @@ import world.gregs.game.playground.ui.zoom.SolidGrid
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-class AStar2 : AbstractPathfinder() {
+class AStar3 : AbstractPathfinder() {
 
-    fun findPath(map: Grid<JPSNode2>, start: Node, goal: Node, heuristic: (Node) -> Double, weight: Double): Result {
+    fun findPath(map: Grid<out Node>, start: Node, goal: Node, heuristic: (Node) -> Double, weight: Double): Result {
 
         val startNode = map.get(start.x, start.y)
-        val goalNode = map.get(goal.x, goal.y)
+        val goal = map.get(goal.x, goal.y)
 
-        require(!(startNode == null || goalNode == null)) { "Start or Goal node not found in SearchSpace" }
+        require(!(startNode == null || goal == null)) { "Start or Goal node not found in SearchSpace" }
 
         // Hash heap seems to net ~10ms on 512x512 maps, but what is the memory impact?
         val openList = BinaryHashHeap(JPSNode2::class.java, map.columns * map.rows)
 //        val openList = LinkedList<JPSNode2>()
 
+        val nodes = mutableMapOf<Int, JPSNode2>()
+        val goalNode = JPSNode2(goal.x, goal.y).apply {
+            nodes[pos] = this
+        }
+
+
         startClock()
 
         // Initialize search by setting G score of start to 0 and adding it to open list
-        startNode.g = 0.0
-        openList.add(startNode)
+//        startNode.g = 0.0
+
+        openList.add(JPSNode2(start.x, start.y).apply {
+            nodes[pos] = this
+        })
 
         // While we still have nodes to check in the open list
         while (openList.size > 0) {
@@ -50,7 +59,7 @@ class AStar2 : AbstractPathfinder() {
 //            addToHistory(currentNode)
 
             // Go through all node neighbours
-            for (neighbourNode in getNeighbours(map, currentNode)) {
+            for (neighbourNode in getNeighbours(map, currentNode, nodes)) {
 
                 // If neighbour is already closed, skip it
                 if (neighbourNode.status == NodeStatus.CLOSED)
@@ -79,8 +88,6 @@ class AStar2 : AbstractPathfinder() {
                         openList.update(neighbourNode)
                     }
 
-//                    addToHistory(neighbourNode)
-
                 }
 
             }
@@ -99,7 +106,11 @@ class AStar2 : AbstractPathfinder() {
     }
 
     companion object {
-        fun getNeighbours(grid: Grid<JPSNode2>, node: JPSNode2): List<JPSNode2> {
+        fun getNeighbours(
+            grid: Grid<out Node>,
+            node: JPSNode2,
+            nodes: MutableMap<Int, JPSNode2>
+        ): List<JPSNode2> {
             val neighbours = ArrayList<JPSNode2>()
             val x = node.x
             val y = node.y
@@ -160,7 +171,9 @@ class AStar2 : AbstractPathfinder() {
             }
 
             for (p in directions) {
-                neighbours.add(grid.get(p.x, p.y) ?: continue)
+                if(grid.inBounds(p.x, p.y)) {
+                    neighbours.add(nodes.getOrPut(p.pos) { JPSNode2(p.x, p.y) })
+                }
             }
 
             return neighbours
