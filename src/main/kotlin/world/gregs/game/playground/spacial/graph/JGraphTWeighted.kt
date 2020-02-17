@@ -4,16 +4,9 @@ import org.jgrapht.Graph
 import org.jgrapht.alg.connectivity.KosarajuStrongConnectivityInspector
 import org.jgrapht.alg.shortestpath.AStarShortestPath
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
-import org.jgrapht.graph.DefaultDirectedGraph
-import org.jgrapht.graph.DefaultEdge
-import org.jgrapht.graph.SimpleGraph
+import org.jgrapht.graph.*
 
-
-
-
-
-
-class JGraphT {
+class JGraphTWeighted {
 
     companion object {
 
@@ -21,26 +14,16 @@ class JGraphT {
         fun main(args: Array<String>) {
 
             // constructs a directed graph with the specified vertices and edges
-            val directedGraph = DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge::class.java)
+            val directedGraph = SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
             directedGraph.addVertex("a")
             directedGraph.addVertex("b")
             directedGraph.addVertex("c")
-            directedGraph.addVertex("d")
-            directedGraph.addVertex("e")
-            directedGraph.addVertex("f")
-            directedGraph.addVertex("g")
-            directedGraph.addVertex("h")
-            directedGraph.addVertex("i")
-            directedGraph.addEdge("a", "b")
-            directedGraph.addEdge("b", "d")
-            directedGraph.addEdge("d", "c")
-            directedGraph.addEdge("c", "a")
-            directedGraph.addEdge("e", "d")
-            directedGraph.addEdge("e", "f")
-            directedGraph.addEdge("f", "g")
-            directedGraph.addEdge("g", "e")
-            directedGraph.addEdge("h", "e")
-            directedGraph.addEdge("i", "h")
+            val ab = directedGraph.addEdge("a", "b")
+            directedGraph.setEdgeWeight(ab, 10.0)
+            val ac = directedGraph.addEdge("a", "c")
+            directedGraph.setEdgeWeight(ac, 1.0)
+            val cb = directedGraph.addEdge("c", "b")
+            directedGraph.setEdgeWeight(cb, 1.0)
 
             // computes all the strongly connected components of the directed graph
             val scAlg = KosarajuStrongConnectivityInspector(directedGraph)
@@ -53,12 +36,13 @@ class JGraphT {
             }
             println()
 
+            println("A to b: ${DijkstraShortestPath.findPathBetween(directedGraph, "a", "b")}")
             // Prints the shortest path from vertex i to vertex c. This certainly
             // exists for our particular directed graph.
             println("Shortest path from i to c:")
             val dijkstraAlg = DijkstraShortestPath(directedGraph)
-            val iPaths = dijkstraAlg.getPaths("i")
-            println(iPaths.getPath("c").toString() + "\n")
+            val iPaths = dijkstraAlg.getPaths("a")
+            println(iPaths.getPath("b").toString() + "\n")
 
             // Prints the shortest path from vertex c to vertex i. This path does
             // NOT exist for our particular directed graph. Hence the path is
