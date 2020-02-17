@@ -1,8 +1,15 @@
 package world.gregs.game.playground.pathfinding.hpastar
 
+import ch.ethz.globis.phtree.v13.PhTree13
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
+import javafx.scene.shape.Line
 import javafx.stage.Stage
+import org.jgrapht.alg.interfaces.AStarAdmissibleHeuristic
+import org.jgrapht.alg.shortestpath.AStarShortestPath
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath
+import org.jgrapht.graph.DefaultWeightedEdge
+import org.jgrapht.graph.SimpleWeightedGraph
 import tornadofx.*
 import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.Direction
@@ -11,23 +18,28 @@ import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
 import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
-import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.abs
 import kotlin.math.floor
+import kotlin.system.measureNanoTime
+
 
 class HierarchicalAStarView : View("HierarchicalAStar") {
 
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
-        const val COLUMNS = 16
-        const val ROWS = 16
-        const val CLUSTER_SIZE = 4
+        const val COLUMNS = 64
+        const val ROWS = 64
+        const val CLUSTER_SIZE = 8
         const val WALL_PERCENT = 0.3
     }
 
     private lateinit var content: Pane
     private val bfs = BreadthFirstSearch(Direction.cardinal)
-    private val interedges = Array(COLUMNS) { Array(ROWS) { false } }
+    val directedGraph = SimpleWeightedGraph<AStarNode, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
+    private val pht = PhTree13<Int>(2)
+    val nodes = mutableMapOf<Int, AStarNode>()
 
     fun setup(grid: BooleanGrid) {
         grid.set(1, 1, true)
@@ -119,29 +131,117 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
         }
     }
 
+    fun addNode(x: Int, y: Int) : AStarNode {
+        val node = AStarNode(x, y)
+        nodes[y + (x shl 14)] = node
+        directedGraph.addVertex(node)
+        pht.put(longArrayOf(x.toLong(), y.toLong()), y + (x shl 14))
+        return node
+    }
+
+    private fun markEntrance(x: Int, y: Int, offsetX: Int, offsetY: Int) {
+        val startX = root.gridToX(x + offsetX + 0.5)
+        val startY = root.gridToY(y + offsetY + 0.5)
+        val endX = root.gridToX(x + 0.5)
+        val endY = root.gridToY(y + 0.5)
+        content.circle(startX, startY, root.tileWidth / 10) {
+            fill = Color.RED
+        }
+        content.circle(endX, endY, root.tileWidth / 10) {
+            fill = Color.RED
+        }
+        root.tileLine(x, y, x + offsetX, y + offsetY) {
+            stroke = Color.RED
+        }
+        val a = addNode(x, y)
+        val b = addNode(x + offsetX, y + offsetY)
+        directedGraph.addEdge(a, b)
+        directedGraph.setEdgeWeight(a, b, 1.0)
+        println("Add edge $a - $b - 1.0")
+    }
+
+    private fun showEntrances() {
+        for (x in 0 until ROWS step CLUSTER_SIZE) {
+            var count = 0
+            for (y in 0 until COLUMNS) {
+                if (y.rem(CLUSTER_SIZE) == 0) {
+                    if (count > 0) {
+                        markEntrance(x, floor(y - count / 2.0).toInt(), -1, 0)
+                        count = 0
+                    }
+                }
+                if (x != 0 && x.rem(CLUSTER_SIZE) == 0) {
+                    val blocked = root.grid.blocked(x, y) || root.grid.blocked(x - 1, y)
+                    if (blocked) {
+                        if (count > 0) {
+                            markEntrance(x, floor(y - count / 2.0).toInt(), -1, 0)
+                            count = 0
+                        }
+                    } else {
+                        count++
+                    }
+                }
+            }
+            if (count > 0) {
+                markEntrance(x, floor(COLUMNS - count / 2.0).toInt(), -1, 0)
+            }
+        }
+
+        for (y in 0 until COLUMNS step CLUSTER_SIZE) {
+            var count = 0
+            for (x in 0 until ROWS) {
+                if (x.rem(CLUSTER_SIZE) == 0) {
+                    if (count > 0) {
+                        markEntrance(floor(x - count / 2.0).toInt(), y, 0, -1)
+                        count = 0
+                    }
+                }
+                if (y != 0 && y.rem(CLUSTER_SIZE) == 0) {
+                    val blocked = root.grid.blocked(x, y) || root.grid.blocked(x, y - 1)
+                    if (blocked) {
+                        if (count > 0) {
+                            markEntrance(floor(x - count / 2.0).toInt(), y, 0, -1)
+                            count = 0
+                        }
+                    } else {
+                        count++
+                    }
+                }
+            }
+            if (count > 0) {
+                markEntrance(floor(ROWS - count / 2.0).toInt(), y, 0, -1)
+            }
+        }
+    }
+
     private fun showLinks() {
         val grid = BooleanGrid(CLUSTER_SIZE, CLUSTER_SIZE)
         for (clusterX in 0 until root.grid.columns step CLUSTER_SIZE) {
             for (clusterY in 0 until root.grid.rows step CLUSTER_SIZE) {
                 grid.clear()
-                for(x in 0 until CLUSTER_SIZE) {
-                    for(y in 0 until CLUSTER_SIZE) {
+                for (x in 0 until CLUSTER_SIZE) {
+                    for (y in 0 until CLUSTER_SIZE) {
                         grid.set(x, y, root.grid.blocked(clusterX + x, clusterY + y))
                     }
                 }
-                for(x in 0 until CLUSTER_SIZE) {
+                for (x in 0 until CLUSTER_SIZE) {
                     for (y in 0 until CLUSTER_SIZE) {
-                        if (interedges.getOrNull(clusterX + x)?.getOrNull(clusterY + y) == true) {
-                            val distances = bfs.search(grid, Node(x, y))
-                            distances.forEachIndexed { dx, it ->
-                                it.forEachIndexed { dy, distance ->
-                                    if (interedges[clusterX + dx][clusterY + dy] && distance > 0) {
-                                        root.tileLine(clusterX + x, clusterY + y, clusterX + dx, clusterY + dy) {
+                        val distances = bfs.search(grid, Node(x, y))
+                        distances.forEachIndexed { dx, it ->
+                            it.forEachIndexed { dy, distance ->
+                                if(distance > 0) {
+                                    val a = nodes[(clusterY + y) + ((clusterX + x) shl 14)]
+                                    val b = nodes[(clusterY + dy) + ((clusterX + dx) shl 14)]
+                                    if(a != null && b != null) {
+                                        println("Add edge $a - $b - $distance")
+                                        directedGraph.addEdge(a, b)
+                                        directedGraph.setEdgeWeight(a, b, distance.toDouble())
+                                        root.tileLine(a.x, a.y, b.x, b.y) {
                                             stroke = Color.RED
                                         }
-                                        content.text("$distance") {
-                                            this.x = root.gridToX(clusterX + dx + 0.5 + ((x - dx)/2.0))
-                                            this.y = root.gridToY(clusterY + dy + 0.5 + ((y - dy)/2.0))
+                                        content.text(distance.toString()) {
+                                            this.x = root.gridToX(b.x + 0.5 + ((a.x.rem(CLUSTER_SIZE) - b.x.rem(CLUSTER_SIZE)) / 2.0))
+                                            this.y = root.gridToY(b.y + 0.5 + ((a.y.rem(CLUSTER_SIZE) - b.y.rem(CLUSTER_SIZE)) / 2.0))
                                             stroke = Color.BLUE
                                         }
                                     }
@@ -154,83 +254,8 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
         }
     }
 
-    private fun markInterEdge(x: Int, y: Int, offsetX: Int, offsetY: Int) {
-        val startX = root.gridToX(x + offsetX + 0.5)
-        val startY = root.gridToY(y + offsetY + 0.5)
-        val endX = root.gridToX(x + 0.5)
-        val endY = root.gridToY(y + 0.5)
-        content.line(startX, startY, endX, endY) {
-            stroke = Color.RED
-        }
-        content.circle(startX, startY, root.tileWidth / 10) {
-            fill = Color.RED
-        }
-        content.circle(endX, endY, root.tileWidth / 10) {
-            fill = Color.RED
-        }
-        interedges[x][y] = true
-        interedges[x + offsetX][y + offsetY] = true
-    }
-
-    private fun showInterEdges() {
-        interedges.forEach {
-            Arrays.fill(it, false)
-        }
-        for (x in 0 until ROWS step CLUSTER_SIZE) {
-            var count = 0
-            for (y in 0 until COLUMNS) {
-                if (y.rem(CLUSTER_SIZE) == 0) {
-                    if (count > 0) {
-                        markInterEdge(x, floor(y - count / 2.0).toInt(), -1, 0)
-                        count = 0
-                    }
-                }
-                if (x != 0 && x.rem(CLUSTER_SIZE) == 0) {
-                    val blocked = root.grid.blocked(x, y) || root.grid.blocked(x - 1, y)
-                    if (blocked) {
-                        if (count > 0) {
-                            markInterEdge(x, floor(y - count / 2.0).toInt(), -1, 0)
-                            count = 0
-                        }
-                    } else {
-                        count++
-                    }
-                }
-            }
-            if (count > 0) {
-                markInterEdge(x, floor(COLUMNS - count / 2.0).toInt(), -1, 0)
-            }
-        }
-
-        for (y in 0 until COLUMNS step CLUSTER_SIZE) {
-            var count = 0
-            for (x in 0 until ROWS) {
-                if (x.rem(CLUSTER_SIZE) == 0) {
-                    if (count > 0) {
-                        markInterEdge(floor(x - count / 2.0).toInt(), y, 0, -1)
-                        count = 0
-                    }
-                }
-                if (y != 0 && y.rem(CLUSTER_SIZE) == 0) {
-                    val blocked = root.grid.blocked(x, y) || root.grid.blocked(x, y - 1)
-                    if (blocked) {
-                        if (count > 0) {
-                            markInterEdge(floor(x - count / 2.0).toInt(), y, 0, -1)
-                            count = 0
-                        }
-                    } else {
-                        count++
-                    }
-                }
-            }
-            if (count > 0) {
-                markInterEdge(floor(ROWS - count / 2.0).toInt(), y, 0, -1)
-            }
-        }
-    }
-
     fun start() {
-        setup(root.grid)
+//        setup(root.grid)
         reload()
     }
 
@@ -238,14 +263,15 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
      * Reloads grid
      */
     private fun reload() {
-//        root.grid.fillRandom(WALL_PERCENT)
+        root.grid.fillRandom(WALL_PERCENT)
         root.reloadGrid()
         showGrid()
-        showInterEdges()
+        showEntrances()
         showClusters()
         showLinks()
     }
 
+    val path = mutableListOf<Line>()
     override val root = grid(
         COLUMNS,
         ROWS,
@@ -261,7 +287,45 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
 
         content.setOnMouseClicked {
             println("Clicked ${(it.x / tileWidth).toInt()} ${(yToGrid(it.y) / tileHeight).toInt()}")
-            reload()
+
+            this@HierarchicalAStarView.path.forEach {
+                this.content.children.remove(it)
+            }
+            this@HierarchicalAStarView.path.clear()
+            val astar = AStarShortestPath(directedGraph, ManhattanDistance())
+            val set = directedGraph.vertexSet()
+            val source = set.random()
+            val target = set.random()
+
+            println("Source: $source Target: $target")
+            println("Astar took: ${measureNanoTime {
+                astar.getPath(source, target)
+            }}ns")
+            println("Dijkstra's: ${measureNanoTime {
+                DijkstraShortestPath.findPathBetween(directedGraph, source, target)
+            }}ns")
+
+            val path = astar.getPath(source, target)
+            var last: AStarNode? = null
+            path.vertexList?.forEach { node ->
+                if(last != null) {
+                    tileLine(last!!.x, last!!.y, node.x, node.y) {
+                        stroke = Color.CYAN
+                        this@HierarchicalAStarView.path.add(this)
+                    }
+                }
+                last = node
+            }
+            println(path)
+
+            val nearest = pht.nearestNeighbour(1, 0, 0).next()
+            println("Nearest neighbour: $nearest ${nodes[nearest]}")
+        }
+    }
+
+    class ManhattanDistance : AStarAdmissibleHeuristic<AStarNode> {
+        override fun getCostEstimate(sourceVertex: AStarNode, targetVertex: AStarNode): Double {
+            return (abs(sourceVertex.x - targetVertex.x) + abs(sourceVertex.y - targetVertex.y)).toDouble()
         }
     }
 }

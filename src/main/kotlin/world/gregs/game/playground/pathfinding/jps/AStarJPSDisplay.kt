@@ -29,8 +29,8 @@ class AStarJPSView : View("AStar") {
     companion object {
         private val boundary = Rectangle(0, 0, 1024, 1024)
         const val PADDING = 100.0
-        const val COLUMNS = 2400
-        const val ROWS = 2400
+        const val COLUMNS = 256
+        const val ROWS = 256
         const val WALL_PERCENT = 0.2
         const val canPassThroughCorners = true
         const val allowDiagonals = true
@@ -105,7 +105,7 @@ class AStarJPSView : View("AStar") {
      */
     private fun reload() {
         content.clear()
-//        showGrid()
+        showGrid()
     }
 
     override val root = grid(grid,
