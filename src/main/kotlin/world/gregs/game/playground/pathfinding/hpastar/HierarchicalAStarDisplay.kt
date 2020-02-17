@@ -37,9 +37,9 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
 
     private lateinit var content: Pane
     private val bfs = BreadthFirstSearch(Direction.cardinal)
-    val directedGraph = SimpleWeightedGraph<AStarNode, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
+    val directedGraph = SimpleWeightedGraph<Node, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
     private val pht = PhTree13<Int>(2)
-    val nodes = mutableMapOf<Int, AStarNode>()
+    val nodes = mutableMapOf<Int, Node>()
 
     fun setup(grid: BooleanGrid) {
         grid.set(1, 1, true)
@@ -131,8 +131,8 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
         }
     }
 
-    fun addNode(x: Int, y: Int) : AStarNode {
-        val node = AStarNode(x, y)
+    fun addNode(x: Int, y: Int) : Node {
+        val node = Node(x, y)
         nodes[y + (x shl 14)] = node
         directedGraph.addVertex(node)
         pht.put(longArrayOf(x.toLong(), y.toLong()), y + (x shl 14))
@@ -306,7 +306,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
             }}ns")
 
             val path = astar.getPath(source, target)
-            var last: AStarNode? = null
+            var last: Node? = null
             path.vertexList?.forEach { node ->
                 if(last != null) {
                     tileLine(last!!.x, last!!.y, node.x, node.y) {
@@ -323,8 +323,8 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
         }
     }
 
-    class ManhattanDistance : AStarAdmissibleHeuristic<AStarNode> {
-        override fun getCostEstimate(sourceVertex: AStarNode, targetVertex: AStarNode): Double {
+    class ManhattanDistance : AStarAdmissibleHeuristic<Node> {
+        override fun getCostEstimate(sourceVertex: Node, targetVertex: Node): Double {
             return (abs(sourceVertex.x - targetVertex.x) + abs(sourceVertex.y - targetVertex.y)).toDouble()
         }
     }
