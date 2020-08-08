@@ -37,7 +37,7 @@ class AStarView : View("AStar") {
         const val ROWS = 8
         const val WALL_PERCENT = 0.1
         const val canPassThroughCorners = true
-        const val allowDiagonals = true
+        const val allowDiagonals = false
     }
 
     private lateinit var content: Pane
