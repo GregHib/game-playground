@@ -6,7 +6,7 @@ import world.gregs.game.playground.pathfinding.astar.AStarView.Companion.allowDi
 import java.util.*
 import kotlin.random.Random
 
-class AStar(private val grid: Grid<AStarNode>) {
+class AStar(private val grid: Grid<AStarNode>, private val allowDiagonals: Boolean = true) {
     val openSet = LinkedList<AStarNode>()
     val closedSet = LinkedList<AStarNode>()
     val path = mutableListOf<AStarNode>()
@@ -122,11 +122,11 @@ class AStar(private val grid: Grid<AStarNode>) {
     }
 
     private fun heuristic(neighbor: AStarNode, end: AStarNode): Double {
-        return if(allowDiagonals) {
-            manhattan(neighbor.x, neighbor.y, end.x, end.y)
-        } else {
-            (kotlin.math.abs(neighbor.x - end.x) + kotlin.math.abs(neighbor.y - end.y)).toDouble()
-        }
+        //if(allowDiagonals) {
+          //  manhattan(neighbor.x, neighbor.y, end.x, end.y)
+        //} else {
+        return (kotlin.math.abs(neighbor.x - end.x) + kotlin.math.abs(neighbor.y - end.y)).toDouble()
+        //}
     }
 
 }

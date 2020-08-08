@@ -26,15 +26,15 @@ class JGraphTWeighted {
             directedGraph.setEdgeWeight(cb, 1.0)
 
             // computes all the strongly connected components of the directed graph
-            val scAlg = KosarajuStrongConnectivityInspector(directedGraph)
-            val stronglyConnectedSubgraphs = scAlg.stronglyConnectedComponents
-
-            // prints the strongly connected components
-            println("Strongly connected components:")
-            for (i in stronglyConnectedSubgraphs.indices) {
-                println(stronglyConnectedSubgraphs[i])
-            }
-            println()
+//            val scAlg = KosarajuStrongConnectivityInspector(directedGraph)
+//            val stronglyConnectedSubgraphs = scAlg.stronglyConnectedComponents
+//
+//            // prints the strongly connected components
+//            println("Strongly connected components:")
+//            for (i in stronglyConnectedSubgraphs.indices) {
+//                println(stronglyConnectedSubgraphs[i])
+//            }
+//            println()
 
             println("A to b: ${DijkstraShortestPath.findPathBetween(directedGraph, "a", "b")}")
             // Prints the shortest path from vertex i to vertex c. This certainly
