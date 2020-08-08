@@ -52,12 +52,9 @@ class KDTreeView : View("KDTree") {
         }
     }
 
-    /**
-     * Reloads quad tree grid and points
-     */
     private fun reload() {
         content.clear()
-        kdTree.root!!.drawCentreLine()
+//        kdTree.root!!.drawCentreLine()
         showPoints()
     }
 
@@ -69,6 +66,10 @@ class KDTreeView : View("KDTree") {
         prefHeight = boundary.height + PADDING
         this@KDTreeView.content = content
 
+        setOnMouseClicked {
+            searchPoint = Point(Random.nextInt(boundary.width), Random.nextInt(boundary.height))
+            reload()
+        }
         reload()
     }
 
