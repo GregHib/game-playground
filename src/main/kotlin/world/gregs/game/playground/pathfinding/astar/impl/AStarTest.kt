@@ -20,14 +20,15 @@ object AStarTest {
             }
         }
 
-        grid.get(1, 6)!!.wall = true
-        grid.get(2, 6)!!.wall = true
-        grid.get(3, 6)!!.wall = true
-        grid.get(4, 6)!!.wall = true
 
-        val aStar = AStar(grid)
-        aStar.start = grid.get(1, 1)!!
-        aStar.end = grid.get(2, 7)!!
+        grid.get(0, 5)!!.wall = true
+        grid.get(1, 5)!!.wall = true
+        grid.get(2, 5)!!.wall = true
+        grid.get(3, 5)!!.wall = true
+
+        val aStar = AStar(grid, false)
+        aStar.start = grid.get(0, 0)!!
+        aStar.end = grid.get(1, 6)!!
 
         val start = System.nanoTime()
         var operations = 0

@@ -23,6 +23,7 @@ dependencies {
     implementation("org.jgrapht:jgrapht-core:1.3.1")
     implementation("org.jgrapht:jgrapht-ext:1.3.1")
     implementation("it.unimi.dsi:fastutil:8.3.0")
+    implementation("es.usc.citius.hipster:hipster-all:1.0.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testImplementation("io.mockk:mockk:1.9.3")

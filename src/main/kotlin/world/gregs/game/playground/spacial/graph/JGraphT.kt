@@ -8,11 +8,6 @@ import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.SimpleGraph
 
-
-
-
-
-
 class JGraphT {
 
     companion object {
