@@ -23,18 +23,23 @@ import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 
 /**
- * A basic a-star path finding algorithm
+ * Two basic a-star path finding algorithms
  * Controls:
  *      Click - start search
  *      R - load new map
+ *
+ * Red = Path 1 visited
+ * Orange = Path 1 to visit
+ * Blue = Path 1
+ * Green = Path 2
  */
 class AStarView : View("AStar") {
 
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
-        const val COLUMNS = 8
-        const val ROWS = 8
+        const val COLUMNS = 32
+        const val ROWS = 32
         const val WALL_PERCENT = 0.1
         const val canPassThroughCorners = true
         const val allowDiagonals = false
@@ -65,11 +70,6 @@ class AStarView : View("AStar") {
 
     var result: Result? = null
 
-    init {
-        aStar.start = grid.get(0, 0)!!
-        aStar.end = grid.get(7, 7)!!
-    }
-
     /**
      * Renders all tiles
      */
@@ -86,29 +86,29 @@ class AStarView : View("AStar") {
             }
         }
 
-        /*for (closed in aStar.closedSet) {
-            content.rectangle(closed.x * w, boundary.height - ((closed.y + 1) * h), w, h) {
+        for (closed in aStar.closedSet) {
+            content.rectangle(closed.x * w, boundary.height - ((closed.y + 1) * h) + (h / 2), w / 2, h / 2) {
                 fill = Color.RED
                 stroke = Color.BLACK
             }
         }
 
         for (open in aStar.openSet) {
-            content.rectangle(open.x * w, boundary.height - ((open.y + 1) * h), w, h) {
-                fill = Color.GREEN
+            content.rectangle(open.x * w + (w / 2), boundary.height - ((open.y + 1) * h) + (h / 2), w / 2, h / 2) {
+                fill = Color.ORANGE
                 stroke = Color.BLACK
             }
-        }*/
+        }
 
         result?.path()?.forEach { step ->
-            content.rectangle(step.x * w, boundary.height - ((step.y + 1) * h), w / 2, h) {
+            content.rectangle(step.x * w, boundary.height - ((step.y + 1) * h), w / 2, h / 2) {
                 fill = Color.GREEN
                 stroke = Color.BLACK
             }
         }
 
         for (step in aStar.path) {
-            content.rectangle(step.x * w + (w / 2), boundary.height - ((step.y + 1) * h), w / 2, h) {
+            content.rectangle(step.x * w + (w / 2), boundary.height - ((step.y + 1) * h), w / 2, h / 2) {
                 fill = Color.BLUE
                 stroke = Color.BLACK
             }
@@ -135,13 +135,16 @@ class AStarView : View("AStar") {
 
         setOnMouseClicked {
             aStar.reset()
-            aStar.randomMap(0.1)
 
             aStar.start.wall = false
             aStar.end.wall = false
+            val start = grid.get(grid.colIndices.random(), grid.rowIndices.random())!!
+            val end = grid.get(grid.colIndices.random(), grid.rowIndices.random())!!
+            aStar.start = start
+            aStar.end = end
 
 
-            val grid = object : Grid<JPSNode2>(8, 8), SolidGrid {
+            val grid = object : Grid<JPSNode2>(columns, rows), SolidGrid {
                 override fun blocked(x: Int, y: Int): Boolean {
                     return get(x, y)?.state != NodeState.EMPTY
                 }
@@ -156,9 +159,9 @@ class AStarView : View("AStar") {
                 }
             }
 
-            val start = grid.get(aStar.start.x, aStar.start.y)!!
-            val end = grid.get(aStar.end.x, aStar.end.y)!!
-            result = AStar3().findPath(grid, start, end, AStar2.manhattan, 1.0)
+            val start3 = grid.get(start.x, start.y)!!
+            val end3 = grid.get(end.x, end.y)!!
+            result = AStar3().findPath(grid, start3, end3, AStar2.manhattan, 1.0)
 
 
             GlobalScope.launch(Dispatchers.JavaFx) {

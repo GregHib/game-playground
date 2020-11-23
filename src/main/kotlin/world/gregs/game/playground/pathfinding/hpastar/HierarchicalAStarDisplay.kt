@@ -226,16 +226,15 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
                 }
                 for (x in 0 until CLUSTER_SIZE) {
                     for (y in 0 until CLUSTER_SIZE) {
-                        val distances = bfs.search(grid, Node(x, y))
+                        val distances = bfs.searchN(grid, Node(x, y))
                         distances.forEachIndexed { dx, it ->
                             it.forEachIndexed { dy, distance ->
                                 if(distance > 0) {
                                     val a = nodes[(clusterY + y) + ((clusterX + x) shl 14)]
                                     val b = nodes[(clusterY + dy) + ((clusterX + dx) shl 14)]
                                     if(a != null && b != null) {
-                                        println("Add edge $a - $b - $distance")
                                         directedGraph.addEdge(a, b)
-                                        directedGraph.setEdgeWeight(a, b, distance.toDouble())
+                                        directedGraph.setEdgeWeight(a, b, distance)
                                         root.tileLine(a.x, a.y, b.x, b.y) {
                                             stroke = Color.RED
                                         }
@@ -307,10 +306,11 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
 
             val path = astar.getPath(source, target)
             var last: Node? = null
-            path.vertexList?.forEach { node ->
+            path?.vertexList?.forEach { node ->
                 if(last != null) {
                     tileLine(last!!.x, last!!.y, node.x, node.y) {
                         stroke = Color.CYAN
+                        strokeWidth += 1.0
                         this@HierarchicalAStarView.path.add(this)
                     }
                 }

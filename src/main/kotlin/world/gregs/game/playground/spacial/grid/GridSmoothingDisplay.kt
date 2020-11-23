@@ -8,6 +8,10 @@ import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 
+/**
+ * Smooths tiles to create dungeon esq maps
+ * Click to smooth (1-5 before scrambling again)
+ */
 class GridSmoothingView : View("Grid smoothing") {
 
     companion object {
@@ -17,7 +21,8 @@ class GridSmoothingView : View("Grid smoothing") {
 
     var smoothingLevel = 0
 
-    override val root = grid(32, 32,
+    override val root = grid(
+        32, 32,
         PADDING,
         PADDING
     ) {
@@ -29,10 +34,10 @@ class GridSmoothingView : View("Grid smoothing") {
 
         fun smooth() {
             val t1 = System.currentTimeMillis()
-            for(x in 0 until grid.columns) {
+            for (x in 0 until grid.columns) {
                 for (y in 0 until grid.rows) {
                     val total = Direction.values().count { grid.blocked(x + it.x, y + it.y) }
-                    if(total > 4) {
+                    if (total > 4) {
                         grid.set(x, y, true)
                     }
                 }
@@ -53,7 +58,7 @@ class GridSmoothingView : View("Grid smoothing") {
         reload()
 
         content.setOnMouseClicked {
-            if(smoothingLevel > 5) {
+            if (smoothingLevel > 5) {
                 randomise()
                 smoothingLevel = 0
             }
@@ -63,7 +68,7 @@ class GridSmoothingView : View("Grid smoothing") {
     }
 }
 
-class GridSmoothingApp : App(InfluenceGridView::class, QuadTreeStyles::class)
+class GridSmoothingApp : App(GridSmoothingView::class, QuadTreeStyles::class)
 
 fun main(args: Array<String>) {
     launch<GridSmoothingApp>(*args)

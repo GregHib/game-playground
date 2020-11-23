@@ -10,6 +10,9 @@ import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 import java.util.*
 
+/**
+ * Splits map into clusters and highlights the furthest points from a wall
+ */
 class DistancesView : View("PH-tree") {
 
     companion object {

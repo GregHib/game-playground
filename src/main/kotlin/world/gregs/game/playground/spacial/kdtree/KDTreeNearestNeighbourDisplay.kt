@@ -10,6 +10,9 @@ import java.awt.Rectangle
 import kotlin.random.Random
 
 /**
+ * Random points stored in a kd tree finds the nearest neighbour to a random selected point.
+ * Cyan point = Point to search from
+ * Green point = Nearest neighbour
  */
 class KDTreeView : View("KDTree") {
 
@@ -38,16 +41,16 @@ class KDTreeView : View("KDTree") {
      */
     private fun showPoints() {
         points.forEach { point ->
-            content.circle(point.x, boundary.height - point.y, 1) {
+            content.circle(point.x, boundary.height - point.y, 3) {
                 fill = Color.WHITE
             }
         }
-        content.circle(searchPoint.x, boundary.height - searchPoint.y, 1) {
+        content.circle(searchPoint.x, boundary.height - searchPoint.y, 3) {
             fill = Color.CYAN
         }
         //Render found nearest neighbour
         val neighbor = kdTree.closestPoint(searchPoint) ?: return
-        content.circle(neighbor.x, boundary.height - neighbor.y, 1) {
+        content.circle(neighbor.x, boundary.height - neighbor.y, 3) {
             fill = Color.LIMEGREEN
         }
     }

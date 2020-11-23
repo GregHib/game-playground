@@ -3,97 +3,82 @@ package world.gregs.game.playground.pathfinding.jps.js
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import tornadofx.*
+import world.gregs.game.playground.spacial.grid.GridSmoothingView
 import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
+import world.gregs.game.playground.ui.zoom.grid
 import world.gregs.game.playground.ui.zoom.zoom
 import java.awt.Rectangle
 
 /**
+ * Basic Jump Point Search
+ * *BROKEN*
+ * Green tile = start point
+ * Red tile = target point
+ * Blue tile = jump point
+ * Black tile = blocked point
+ *
  */
 class JPSView : View("JPS") {
 
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
-        const val COLUMNS = 50
-        const val ROWS = 50
-        const val WALL_PERCENT = 0.3
-        const val canPassThroughCorners = true
-        const val allowDiagonals = true
+        const val COLUMNS = 32
+        const val ROWS = 32
+        const val WALL_PERCENT = 0.1
+        const val canPassThroughCorners = false
     }
-
 
     private lateinit var content: Pane
-    var jps = JPS(COLUMNS, ROWS, 5, 10, false, false, null)
 
-    /**
-     * Renders all tiles
-     */
-    private fun showGrid() {
-        val w = boundary.width / COLUMNS
-        val h = boundary.height / ROWS
-        for (x in 0 until COLUMNS) {
-            for (y in 0 until ROWS) {
-                val cell = jps.grid.getNode(x, y)
-                content.rectangle(x * w, y * h, w, h) {
-                    fill = if (cell?.walkable == false) Color.BLACK else Color.WHITE
-                    stroke = Color.BLACK
-                }
-            }
-        }
-        for(step in jps.trail ?: return) {
-            content.rectangle(step.x * w, step.y * h, w, h) {
-                fill = Color.BLUE
-                stroke = Color.BLACK
-            }
-        }
-        content.rectangle(jps.startX * w, jps.startY * h, w, h) {
-            fill = Color.GREEN
-            stroke = Color.BLACK
-        }
-        content.rectangle(jps.endX * w, jps.endY * h, w, h) {
-            fill = Color.RED
-            stroke = Color.BLACK
-        }
-    }
-
-    /**
-     * Reloads grid
-     */
-    private fun reload() {
-        content.clear()
-        showGrid()
-    }
-
-    override val root = zoom(
+    override val root = grid(
+        COLUMNS,
+        ROWS,
         PADDING,
-        PADDING, 1.0, 10.0
+        PADDING
     ) {
         prefWidth = boundary.width + PADDING
         prefHeight = boundary.height + PADDING
+        content.prefWidth = boundary.width.toDouble()
+        content.prefHeight = boundary.height.toDouble()
         this@JPSView.content = content
 
+
+        fun randomise() {
+            grid.fillRandom(WALL_PERCENT)
+        }
+
+        fun reload() {
+            reloadGrid()
+            val array = Array(columns) { x -> Array(rows) { y -> JPSNode(x, y) } }
+            for (x in 0 until columns) {
+                for (y in 0 until rows) {
+                    if (grid.blocked(x, y)) {
+                        array[x][y].walkable = false
+                    }
+                }
+            }
+            val jps = JPS(columns, rows, 5, 10, false, false, array)
+            for (step in jps.trail ?: return) {
+                tile(step.x, step.y) {
+                    fill = Color.BLUE
+                }
+            }
+            tile(jps.startX, jps.startY) {
+                fill = Color.GREEN
+            }
+            tile(jps.endX, jps.endY) {
+                fill = Color.RED
+            }
+        }
+
+        randomise()
         reload()
 
         setOnMouseClicked {
-            //            aStar.reset()
-//            path = jps.findPathSync(start, end, true, true)
+            randomise()
             reload()
-//            GlobalScope.launch(Dispatchers.JavaFx) {
-//                while (!aStar.complete) {
-//                    aStar.loop()
-//                    reload()
-//                    delay(10)
-//                }
-//            }
         }
-//
-//        primaryStage.addEventFilter(KeyEvent.KEY_PRESSED) { event ->
-//            if(event.code == KeyCode.R) {
-//                aStar.reset()
-//                aStar.randomMap()
-//                reload()
-//            }
-//        }
     }
 }
 

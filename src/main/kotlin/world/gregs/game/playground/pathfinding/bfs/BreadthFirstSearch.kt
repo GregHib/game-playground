@@ -31,13 +31,9 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
         }
     }
 
-    fun search(grid: Grid<*>, start: Node): Array<Array<Int>> {
-        return arrayOf(emptyArray())
-    }
-
     fun searchN(grid: Grid<*>, start: Node): Array<Array<Double>> {
         val distances = Array(grid.columns) { Array(grid.rows) { -1.0 } }
-        println("BFS took ${measureNanoTime {
+//        println("BFS took ${measureNanoTime {
             val queue = LinkedList<Node>()
             queue.add(start)
             distances[start.x][start.y] = 0.0
@@ -53,7 +49,7 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
                     }
                 }
             }
-        }}")
+//        }}")
         return distances
     }
 
