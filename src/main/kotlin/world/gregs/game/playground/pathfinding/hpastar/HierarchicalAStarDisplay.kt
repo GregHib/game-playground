@@ -286,7 +286,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
 
 
         content.setOnMouseClicked {
-            println("Clicked ${(it.x / tileWidth).toInt()} ${(yToGrid(it.y) / tileHeight).toInt()}")
+            println("Clicked ${it.gridX} ${it.gridY}")
 
             this@HierarchicalAStarView.path.forEach {
                 this.content.children.remove(it)

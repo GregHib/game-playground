@@ -63,7 +63,7 @@ class GridSmoothingView : View("Grid smoothing") {
     }
 }
 
-class GridSmoothingApp : App(GridSmoothingView::class, QuadTreeStyles::class)
+class GridSmoothingApp : App(InfluenceGridView::class, QuadTreeStyles::class)
 
 fun main(args: Array<String>) {
     launch<GridSmoothingApp>(*args)

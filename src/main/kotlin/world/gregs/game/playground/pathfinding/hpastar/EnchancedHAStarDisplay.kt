@@ -244,7 +244,7 @@ class EnhancedHAStarView : View("EnhancedHAStar") {
 
 
         content.setOnMouseClicked {
-            println("Clicked ${(it.x / tileWidth).toInt()} ${(yToGrid(it.y) / tileHeight).toInt()}")
+            println("Clicked ${it.gridX} ${it.gridY}")
 
             this@EnhancedHAStarView.path.forEach {
                 this.content.children.remove(it)
