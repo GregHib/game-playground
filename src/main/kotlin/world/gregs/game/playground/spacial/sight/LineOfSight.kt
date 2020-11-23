@@ -1,4 +1,4 @@
-package world.gregs.game.playground.spacial.los
+package world.gregs.game.playground.spacial.sight
 
 import world.gregs.game.playground.ui.zoom.SolidGrid
 import kotlin.math.abs

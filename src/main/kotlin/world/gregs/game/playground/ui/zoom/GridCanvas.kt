@@ -1,6 +1,7 @@
 package world.gregs.game.playground.ui.zoom
 
 import javafx.event.EventTarget
+import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Rectangle
@@ -21,12 +22,21 @@ class GridCanvas<T : Any, G : Grid<T>>(
 
     val columns: Int = grid.columns
     val rows: Int = grid.rows
+    var backgroundColour: Color = Color.WHITE
+    var gridLineColour: Color = Color.BLACK
+
     lateinit var background: Rectangle
 
     var width: Int = 0
     var height: Int = 0
     var tileWidth: Int = 0
     var tileHeight: Int = 0
+
+    val MouseEvent.gridX: Int
+        get() = (x / tileWidth).toInt()
+
+    val MouseEvent.gridY: Int
+        get() = (yToGrid(y) / tileHeight).toInt()
 
     fun updateSize() {
         width = content.prefWidth.toInt()
@@ -40,30 +50,30 @@ class GridCanvas<T : Any, G : Grid<T>>(
         content.clear()
 
         background = content.rectangle(0, 0, width, height) {
-            fill = Color.WHITE
+            fill = backgroundColour
         }
 
         // vertical lines
         for (x in tileWidth until width step tileWidth) {
             content.line(x, 0.5, x, height - 0.5) {
-                stroke = Color.BLACK
+                stroke = gridLineColour
             }
         }
 
         // horizontal lines
         for (y in tileHeight until height step tileHeight) {
             content.line(0.5, y, width - 0.5, y) {
-                stroke = Color.BLACK
+                stroke = gridLineColour
             }
         }
 
         // tiles
-        if(grid is SolidGrid) {
+        if (grid is SolidGrid) {
             for (x in 0 until columns) {
                 for (y in 0 until rows) {
                     if (grid.blocked(x, y)) {
                         tile(x, y) {
-                            fill = Color.BLACK
+                            fill = gridLineColour
                         }
                     }
                 }

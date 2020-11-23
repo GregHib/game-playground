@@ -1,4 +1,4 @@
-package world.gregs.game.playground.spacial.los
+package world.gregs.game.playground.spacial.sight
 
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
@@ -56,11 +56,9 @@ class LineOfSightView : View("Line of sight view") {
         }
 
         fun reload(it: MouseEvent) {
-            val x = (it.x / tileWidth).toInt()
-            val y = (yToGrid(it.y) / tileHeight).toInt()
-            updateLOS(x, y, VIEW_DISTANCE)
+            updateLOS(it.gridX, it.gridY, VIEW_DISTANCE)
             reload()
-            tile(x, y) {
+            tile(it.gridX, it.gridY) {
                 fill = Color.CORNFLOWERBLUE
             }
         }
