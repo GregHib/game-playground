@@ -1,3 +1,3 @@
-rootProject.name = "playground"
+rootProject.name = "game-playground"
 
 include("benchmarks")
