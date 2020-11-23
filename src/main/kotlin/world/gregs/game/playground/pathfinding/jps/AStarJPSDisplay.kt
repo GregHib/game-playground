@@ -13,7 +13,7 @@ import world.gregs.game.playground.pathfinding.astar.impl3.AStar3
 import world.gregs.game.playground.pathfinding.jps.node.JPSNode2
 import world.gregs.game.playground.pathfinding.jps.node.NodeState
 import world.gregs.game.playground.pathfinding.jps.node.NodeStatus
-import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
+import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.SolidGrid
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
