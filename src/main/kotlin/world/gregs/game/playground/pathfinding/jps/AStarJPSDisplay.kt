@@ -24,7 +24,7 @@ import java.awt.Rectangle
  *      Click - start search
  *      R - load new map
  */
-class AStarJPSView : View("AStar") {
+class AStarJPSView : View("JPS") {
 
     companion object {
         private val boundary = Rectangle(0, 0, 1024, 1024)

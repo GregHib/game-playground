@@ -1,4 +1,4 @@
-package world.gregs.game.playground.pathfinding.floodfill
+package world.gregs.game.playground.spacial.grid
 
 import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
@@ -18,7 +18,7 @@ import kotlin.random.Random
 /**
  * Uses flood fill to determine distinct connected regions in a map
  */
-class RegionsView : View("Regions") {
+class RegionGroupingView : View("Region grouping") {
 
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
@@ -49,7 +49,7 @@ class RegionsView : View("Regions") {
             for(x in 0 until grid.columns) {
                 for(y in 0 until grid.rows) {
                     if(!grid.blocked(x, y) && cluster[x][y] == -1) {
-                        val results = bfs.search(grid, Node(x, y))
+                        val results = bfs.searchN(grid, Node(x, y))
                         for(rx in 0 until grid.columns) {
                             for (ry in 0 until grid.rows) {
                                 if(results[rx][ry] > -1) {
@@ -91,7 +91,7 @@ class RegionsView : View("Regions") {
     }
 }
 
-class RegionsApp : App(RegionsView::class, QuadTreeStyles::class)
+class RegionsApp : App(RegionGroupingView::class, QuadTreeStyles::class)
 
 fun main(args: Array<String>) {
     launch<RegionsApp>(*args)

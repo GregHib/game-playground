@@ -8,7 +8,7 @@ import javax.swing.UnsupportedLookAndFeelException
 import kotlin.math.max
 import kotlin.random.Random
 
-class RegionGrid {
+class SwingGrid {
     inner class GridPane(val data: Array<Array<Color?>>) : JPanel() {
         override fun getPreferredSize(): Dimension {
             return Dimension(900, 900)
@@ -35,7 +35,7 @@ class RegionGrid {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            RegionGrid()
+            SwingGrid()
         }
     }
 

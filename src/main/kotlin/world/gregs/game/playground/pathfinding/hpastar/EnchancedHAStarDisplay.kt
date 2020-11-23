@@ -196,7 +196,8 @@ class EnhancedHAStarView : View("EnhancedHAStar") {
                 while(r.hasNext()) {
                     val node = nodes[r.next()] ?: continue
                     bfs.forEach(root.grid, node, bounds) { x, y, distance ->
-                        if(nodes.containsKey(y + (x shl 14))) {
+                        val b = nodes[y + (x shl 14)]
+                        if(b != null) {
                             root.tileLine(node.x, node.y, x, y) {
                                 stroke = Color.RED
                             }
@@ -205,6 +206,8 @@ class EnhancedHAStarView : View("EnhancedHAStar") {
                                 this.y = root.gridToY(y + 0.5 + ((node.y - y) / 2.0))
                                 stroke = Color.BLUE
                             }
+                            directedGraph.addEdge(node, b)
+                            directedGraph.setEdgeWeight(node, b, distance.toDouble())
                         }
                     }
                 }
@@ -265,10 +268,11 @@ class EnhancedHAStarView : View("EnhancedHAStar") {
 
             val path = astar.getPath(source, target)
             var last: Node? = null
-            path.vertexList?.forEach { node ->
+            path?.vertexList?.forEach { node ->
                 if(last != null) {
                     tileLine(last!!.x, last!!.y, node.x, node.y) {
                         stroke = Color.CYAN
+                        strokeWidth += 1.0
                         this@EnhancedHAStarView.path.add(this)
                     }
                 }

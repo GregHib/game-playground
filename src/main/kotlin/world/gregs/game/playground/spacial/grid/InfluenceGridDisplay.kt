@@ -11,6 +11,12 @@ import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 
+/**
+ * Visualises the cloud of influence of a point spread out over an area
+ * Right click to add friendly influence (blue)
+ * Left click to add enemy influence (red)
+ * http://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter29_Escaping_the_Grid_Infinite-Resolution_Influence_Mapping.pdf
+ */
 class InfluenceGridView : View("Influence grid") {
 
     companion object {

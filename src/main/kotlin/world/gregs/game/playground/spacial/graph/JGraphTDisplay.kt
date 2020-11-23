@@ -13,8 +13,6 @@ import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 import java.util.*
 
-
-
 class JGraphTView : View("JGraphT algorithm") {
 
     companion object {

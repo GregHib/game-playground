@@ -9,6 +9,13 @@ import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 
+/**
+ * Grid based line of sight using Bresenham's line algorithm
+ * Controls:
+ *      scroll to zoom
+ *      hold space + drag to pan
+ *      double click to scramble tiles
+ */
 class LineOfSightView : View("Line of sight view") {
 
     companion object {
