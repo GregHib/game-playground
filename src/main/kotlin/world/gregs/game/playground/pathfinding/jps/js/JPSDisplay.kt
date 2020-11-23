@@ -3,10 +3,8 @@ package world.gregs.game.playground.pathfinding.jps.js
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import tornadofx.*
-import world.gregs.game.playground.spacial.grid.GridSmoothingView
-import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
+import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
-import world.gregs.game.playground.ui.zoom.zoom
 import java.awt.Rectangle
 
 /**

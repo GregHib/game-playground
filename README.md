@@ -51,7 +51,7 @@ Different pre-processing method used
 
 > Different JPS implementation
 
-## Spacial
+## Spatial
 
 ### Region grouping
 

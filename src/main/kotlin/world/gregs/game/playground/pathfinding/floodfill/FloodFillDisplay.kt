@@ -7,7 +7,7 @@ import tornadofx.launch
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
 import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
-import world.gregs.game.playground.spacial.quadtree.QuadTreeStyles
+import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 import kotlin.random.Random
