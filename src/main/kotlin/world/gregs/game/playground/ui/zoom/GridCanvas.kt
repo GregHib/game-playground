@@ -108,7 +108,7 @@ class GridCanvas<T : Any, G : Grid<T>>(
         content.text(value) {
             textAlignment = TextAlignment.CENTER
             this.x = gridToX(startX + 0.5) - (boundsInLocal.width / 2)
-            this.y = gridToY(startY + 0.5) + (boundsInLocal.height / 2)
+            this.y = gridToY(startY + 0.5) + (boundsInLocal.height / 4)
             op.invoke(this)
         }
     }
@@ -116,10 +116,8 @@ class GridCanvas<T : Any, G : Grid<T>>(
     fun tileText(startX: Int, startY: Int, endX: Int, endY: Int, value: String, op: Text.() -> Unit = {}) {
         content.text(value) {
             textAlignment = TextAlignment.CENTER
-            val endX = gridToX(endX + 0.5)
-            val endY = gridToY(endY + 0.5)
-            this.x = endX - (boundsInLocal.width / 2) + (gridToX(startX + 0.5) - endX) / 2.0
-            this.y = endY + (boundsInLocal.height / 2) + (gridToY(startY + 0.5) - endY) / 2.0
+            this.x = gridToX(endX) - (boundsInLocal.width / 2) + (gridToX(startX) - gridToX(endX)) / 2.0
+            this.y = gridToY(endY + 0.5) + (boundsInLocal.height / 2) + (gridToY(startY) - gridToY(endY)) / 2.0
             op.invoke(this)
         }
     }

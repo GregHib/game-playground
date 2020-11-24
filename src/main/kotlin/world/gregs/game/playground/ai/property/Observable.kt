@@ -6,7 +6,7 @@ import kotlin.reflect.KProperty
 /**
  * A generic observable property with multiple observers.
  */
-abstract class ObservableProperty<T : Any>(initialValue: T) : ReadWriteProperty<Any?, T> {
+abstract class Observable<T : Any>(initialValue: T) : ReadWriteProperty<Any?, T> {
     protected var value = initialValue
         set(value) {
             if(field != value) {

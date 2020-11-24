@@ -7,6 +7,7 @@ import tornadofx.View
 import tornadofx.launch
 import world.gregs.game.playground.chebyshev
 import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
+import world.gregs.game.playground.spatial.sight.Distance.getNearest
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
 
@@ -29,15 +30,6 @@ class DistanceView : View("Distance view") {
     private var targetY = 0
     private val targetWidth = 2
     private val targetHeight = 2
-
-    private fun getNearest(source: Int, size: Int, target: Int): Int {
-        val max = source + size - 1
-        return when {
-            target > max -> max
-            target < source -> source
-            else -> target
-        }
-    }
 
     override val root = grid(
         32, 32,
