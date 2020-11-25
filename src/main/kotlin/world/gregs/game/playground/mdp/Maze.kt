@@ -1,7 +1,12 @@
 package world.gregs.game.playground.mdp
 
+import javafx.scene.paint.Color
+import javafx.scene.text.TextAlignment
+import tornadofx.text
+import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.Grid
 import world.gregs.game.playground.Node
+import world.gregs.game.playground.ui.zoom.GridCanvas
 import world.gregs.game.playground.ui.zoom.SolidGrid
 
 class Maze {
@@ -13,7 +18,7 @@ class Maze {
 
     val grid: Grid<State> = object : Grid<State>(COLUMNS, ROWS), SolidGrid {
         override fun blocked(x: Int, y: Int): Boolean {
-            return get(x, y)?.isWall != false
+            return get(x, y)?.isWall == true
         }
     }
 
@@ -66,6 +71,32 @@ class Maze {
                         0.1 to filter(state, a.left().getSuccessor(state.coords)),
                         0.1 to filter(state, a.right().getSuccessor(state.coords))
                     )
+                }
+            }
+        }
+    }
+
+    fun showGrid(canvas: GridCanvas<State, Grid<State>>){
+        for (x in grid.colIndices) {
+            for (y in grid.rowIndices) {
+                val cell = grid.get(x, y)!!
+//                canvas.tile(x, y) {
+//                    fill = when {
+//                        cell.isWall -> Color.BLACK
+//                        cell.isGoal -> Color.DEEPSKYBLUE
+//                        else -> Color.WHITE
+//                    }
+//                    stroke = Color.BLACK
+//                }
+                if(!cell.isWall) {
+                    canvas.content.text("%.3f".format(cell.utility)) {
+                        textAlignment = TextAlignment.CENTER
+                        val negative = cell.utility < 0
+                        val xOffset = 0//if(negative) 19 else 16
+                        this.x = (canvas.gridToX(x + 0.5) - (boundsInLocal.width / 2) - xOffset)
+                        this.y = (canvas.gridToY(y + 0.5) + (boundsInLocal.height / 2) + 3)
+                        stroke = if(negative) Color.RED else Color.FORESTGREEN
+                    }
                 }
             }
         }
