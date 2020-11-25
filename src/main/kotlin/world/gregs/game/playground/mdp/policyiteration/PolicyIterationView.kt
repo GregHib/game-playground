@@ -18,8 +18,6 @@ class PolicyIterationView : View("Policy iteration view") {
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
-        const val COLUMNS = 10
-        const val ROWS = 10
     }
 
     private lateinit var content: Pane
@@ -65,9 +63,8 @@ class PolicyIterationView : View("Policy iteration view") {
         showGrid()
     }
 
-
     override val root = grid(
-        COLUMNS, ROWS, PADDING, PADDING
+        Maze.COLUMNS, Maze.ROWS, PADDING, PADDING
     ){
         prefWidth = boundary.width + PADDING
         prefHeight = boundary.height + PADDING
