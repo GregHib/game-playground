@@ -81,6 +81,8 @@ Different pre-processing method used
 
 ![](./src/main/resources/images/LineOfSight.png)
 
+## Markov Decision Process (MDP)
+
 ### Value Iteration
 
 ![](./src/main/resources/images/ValueIteration.png)
