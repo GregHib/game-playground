@@ -80,3 +80,11 @@ Different pre-processing method used
 ### Line of sight - Bresenham's line algorithm
 
 ![](./src/main/resources/images/LineOfSight.png)
+
+### Value Iteration
+
+![](./src/main/resources/images/ValueIteration.png)
+
+### Policy Iteration
+
+![](./src/main/resources/images/PolicyIteration.png)
