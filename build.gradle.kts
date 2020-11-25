@@ -24,6 +24,7 @@ dependencies {
     implementation("org.jgrapht:jgrapht-ext:1.5.0")
     implementation("it.unimi.dsi:fastutil:8.4.3")
     implementation("es.usc.citius.hipster:hipster-all:1.0.1")
+    implementation(group = "org.apache.commons", name = "commons-math3", version = "3.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
     testImplementation("io.mockk:mockk:1.10.2")
