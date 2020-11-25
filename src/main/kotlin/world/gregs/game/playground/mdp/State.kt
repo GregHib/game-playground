@@ -1,5 +1,6 @@
 package world.gregs.game.playground.mdp
 
+import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
 
 class State(private val x: Int, private val y: Int) {
@@ -9,21 +10,21 @@ class State(private val x: Int, private val y: Int) {
     /**
      * Map of actions to probability-state pairs.
      */
-    val transitions = HashMap<Action, List<ProbableState>>()
-    val actions = Action.values()
-    var policy: Action? = null
+    val transitions = HashMap<Direction, List<ProbableState>>()
+    val actions = Direction.cardinal
+    var policy: Direction? = null
     var coords = Node(x, y)
     var isGoal = false
     var isWall = false
     var id = 0
 
-    fun computeExpectedUtility(action: Action): Double {
+    fun computeExpectedUtility(action: Direction): Double {
         return transitions[action]!!.sumByDouble {
             it.probability * it.state.utility
         }
     }
 
-    fun selectBestAction(): Action {
+    fun selectBestAction(): Direction {
         return actions.maxByOrNull {
             computeExpectedUtility(it)
         }!!

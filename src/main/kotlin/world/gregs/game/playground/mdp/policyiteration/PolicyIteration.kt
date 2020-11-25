@@ -2,6 +2,7 @@ package world.gregs.game.playground.mdp.policyiteration
 
 import org.apache.commons.math3.linear.MatrixUtils
 import org.apache.commons.math3.linear.SingularValueDecomposition
+import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Grid
 import world.gregs.game.playground.mdp.*
 
@@ -35,7 +36,7 @@ class PolicyIteration(private val grid: Grid<State>) {
                 if(state.isGoal)
                     continue
                 var maxUtility = Double.NEGATIVE_INFINITY
-                var bestAction: Action? = null
+                var bestAction: Direction? = null
                 for(action in state.actions){
                     val successor = grid.get(action.getSuccessor(state.coords)) ?: continue
                     val expectedUtility = successor.utility
