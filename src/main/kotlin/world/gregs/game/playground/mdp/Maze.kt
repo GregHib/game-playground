@@ -2,12 +2,16 @@ package world.gregs.game.playground.mdp
 
 import world.gregs.game.playground.Grid
 import world.gregs.game.playground.Node
-import world.gregs.game.playground.mdp.policyiteration.PolicyIterationView
 import world.gregs.game.playground.ui.zoom.SolidGrid
 
 class Maze {
 
-    val grid: Grid<State> = object : Grid<State>(PolicyIterationView.COLUMNS, PolicyIterationView.ROWS), SolidGrid {
+    companion object {
+        const val COLUMNS = 10
+        const val ROWS = 10
+    }
+
+    val grid: Grid<State> = object : Grid<State>(COLUMNS, ROWS), SolidGrid {
         override fun blocked(x: Int, y: Int): Boolean {
             return get(x, y)?.isWall != false
         }
@@ -17,7 +21,7 @@ class Maze {
         for (x in grid.colIndices) {
             for (y in grid.rowIndices) {
                 grid.set(x, y, State(x, y).also {
-                    it.id = y * PolicyIterationView.COLUMNS + x
+                    it.id = y * COLUMNS + x
                     it.reward = -0.04
                 })
             }

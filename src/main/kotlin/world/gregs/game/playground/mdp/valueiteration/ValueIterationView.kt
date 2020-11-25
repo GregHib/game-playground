@@ -8,10 +8,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import tornadofx.*
-import world.gregs.game.playground.Grid
-import world.gregs.game.playground.Node
 import world.gregs.game.playground.mdp.Maze
-import world.gregs.game.playground.mdp.State
 import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
@@ -21,8 +18,6 @@ class ValueIterationView : View("Value iteration view") {
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
-        const val COLUMNS = 10
-        const val ROWS = 10
     }
 
     private lateinit var content: Pane
@@ -69,9 +64,8 @@ class ValueIterationView : View("Value iteration view") {
         showGrid()
     }
 
-
     override val root = grid(
-        COLUMNS, ROWS, PADDING, PADDING
+        Maze.COLUMNS, Maze.ROWS, PADDING, PADDING
     ){
         prefWidth = boundary.width + PADDING
         prefHeight = boundary.height + PADDING
@@ -89,23 +83,6 @@ class ValueIterationView : View("Value iteration view") {
             }
         }
     }
-}
-
-private fun Grid<State>.get(node: Node): State?{
-    return get(node.x, node.y)
-}
-
-private fun State.setGoal(d: Double) {
-    isGoal = true
-    utility = d
-    reward = d
-}
-
-private fun State.setWall() {
-    isGoal = true
-    isWall = true
-    utility = 0.0
-    reward = 0.0
 }
 
 class ValueIterationApp : App(ValueIterationView::class, QuadTreeStyles::class)
