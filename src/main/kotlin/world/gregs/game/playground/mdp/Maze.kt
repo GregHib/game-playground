@@ -62,7 +62,7 @@ class Maze {
                 for(a in state.actions){
                     state.transitions[a] = listOf(
                         0.7 to filter(state, a.getSuccessor(state.coords)),
-                        0.1 to filter(state, a.opposite().getSuccessor(state.coords)),
+                        0.1 to filter(state, a.inverse().getSuccessor(state.coords)),
                         0.1 to filter(state, a.left().getSuccessor(state.coords)),
                         0.1 to filter(state, a.right().getSuccessor(state.coords))
                     )
