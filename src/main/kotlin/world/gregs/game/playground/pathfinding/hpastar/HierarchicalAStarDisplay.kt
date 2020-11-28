@@ -237,9 +237,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
                                         root.tileLine(a.x, a.y, b.x, b.y) {
                                             stroke = Color.RED
                                         }
-                                        content.text(distance.toString()) {
-                                            this.x = root.gridToX(b.x + 0.5 + ((a.x.rem(CLUSTER_SIZE) - b.x.rem(CLUSTER_SIZE)) / 2.0))
-                                            this.y = root.gridToY(b.y + 0.5 + ((a.y.rem(CLUSTER_SIZE) - b.y.rem(CLUSTER_SIZE)) / 2.0))
+                                        root.tileText(a.x, a.y, b.x, b.y, distance.toString()) {
                                             stroke = Color.BLUE
                                         }
                                     }

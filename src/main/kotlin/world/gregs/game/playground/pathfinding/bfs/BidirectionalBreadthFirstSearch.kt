@@ -25,10 +25,7 @@ class BidirectionalBreadthFirstSearch(private val directions: Array<Direction>) 
             val y = index / width
             val distance = getDistance(hash)
             if (distance != -1) {
-                canvas.content.text(distance.toString()) {
-                    textAlignment = TextAlignment.CENTER
-                    this.x = canvas.gridToX(x + 0.5) - (boundsInLocal.width / 2)
-                    this.y = canvas.gridToY(y + 0.5) + (boundsInLocal.height / 2)
+                canvas.tileText(x, y, distance.toString()) {
                     stroke = Color.RED
                 }
             }
@@ -70,10 +67,7 @@ class BidirectionalBreadthFirstSearch(private val directions: Array<Direction>) 
                 path.forEach {
                     val x = it % width
                     val y = it / width
-                    canvas.content.text("[      ]") {
-                        textAlignment = TextAlignment.CENTER
-                        this.x = canvas.gridToX(x + 0.5) - (boundsInLocal.width / 2)
-                        this.y = canvas.gridToY(y + 0.5) + (boundsInLocal.height / 2)
+                    canvas.tileText(x, y, "[      ]") {
                         stroke = Color.ORANGE
                     }
                 }

@@ -1,11 +1,9 @@
 package world.gregs.game.playground.spatial.grid
 
 import javafx.scene.paint.Color
-import javafx.scene.text.TextAlignment
 import tornadofx.App
 import tornadofx.View
 import tornadofx.launch
-import tornadofx.text
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
 import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
@@ -70,11 +68,8 @@ class RegionGroupingView : View("Region grouping") {
             for(x in 0 until grid.columns) {
                 for (y in 0 until grid.rows) {
                     if(cluster[x][y] > -1) {
-                        content.text(cluster[x][y].toString()) {
-                            this.x = gridToX(x + 0.5)
-                            this.y = gridToY(y + 0.5)
+                        tileText(x, y, cluster[x][y].toString()) {
                             stroke = colours.getOrPut(cluster[x][y]) { Color.rgb(Random.nextInt(0, 255), Random.nextInt(0, 255), Random.nextInt(0, 255))}
-                            textAlignment = TextAlignment.CENTER
                         }
                     }
                 }

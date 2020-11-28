@@ -2,7 +2,6 @@ package world.gregs.game.playground.spatial.phtree
 
 import ch.ethz.globis.phtree.v13.PhTree13
 import javafx.scene.paint.Color
-import javafx.scene.text.TextAlignment
 import tornadofx.*
 import world.gregs.game.playground.manhattan
 import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
@@ -96,11 +95,8 @@ class DistancesView : View("PH-tree") {
             //Distances
             for(x in 0 until grid.columns) {
                 for (y in 0 until grid.rows) {
-                    content.text(distances[x][y].toString()) {
-                        this.x = gridToX(x + 0.5)
-                        this.y = gridToY(y + 0.5)
+                    tileText(x, y, distances[x][y].toString()) {
                         stroke = Color.RED
-                        textAlignment = TextAlignment.CENTER
                     }
                 }
             }

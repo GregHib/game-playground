@@ -89,13 +89,8 @@ class Maze {
 //                    stroke = Color.BLACK
 //                }
                 if(!cell.isWall) {
-                    canvas.content.text("%.3f".format(cell.utility)) {
-                        textAlignment = TextAlignment.CENTER
-                        val negative = cell.utility < 0
-                        val xOffset = 0//if(negative) 19 else 16
-                        this.x = (canvas.gridToX(x + 0.5) - (boundsInLocal.width / 2) - xOffset)
-                        this.y = (canvas.gridToY(y + 0.5) + (boundsInLocal.height / 2) + 3)
-                        stroke = if(negative) Color.RED else Color.FORESTGREEN
+                    canvas.tileText(x, y, "%.3f".format(cell.utility)) {
+                        stroke = if(cell.utility < 0) Color.RED else Color.FORESTGREEN
                     }
                 }
             }

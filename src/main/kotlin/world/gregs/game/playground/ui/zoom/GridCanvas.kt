@@ -5,10 +5,9 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Rectangle
-import tornadofx.clear
-import tornadofx.line
-import tornadofx.opcr
-import tornadofx.rectangle
+import javafx.scene.text.Text
+import javafx.scene.text.TextAlignment
+import tornadofx.*
 import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.Grid
 
@@ -103,6 +102,26 @@ class GridCanvas<T : Any, G : Grid<T>>(
 
     fun line(startX: Int, startY: Int, endX: Int, endY: Int, op: Line.() -> Unit = {}) {
         content.line(gridToX(startX), gridToY(startY), gridToX(endX), gridToY(endY), op)
+    }
+
+    fun tileText(startX: Int, startY: Int, value: String, op: Text.() -> Unit = {}) {
+        content.text(value) {
+            textAlignment = TextAlignment.CENTER
+            this.x = gridToX(startX + 0.5) - (boundsInLocal.width / 2)
+            this.y = gridToY(startY + 0.5) + (boundsInLocal.height / 2)
+            op.invoke(this)
+        }
+    }
+
+    fun tileText(startX: Int, startY: Int, endX: Int, endY: Int, value: String, op: Text.() -> Unit = {}) {
+        content.text(value) {
+            textAlignment = TextAlignment.CENTER
+            val endX = gridToX(endX + 0.5)
+            val endY = gridToY(endY + 0.5)
+            this.x = endX - (boundsInLocal.width / 2) + (gridToX(startX + 0.5) - endX) / 2.0
+            this.y = endY + (boundsInLocal.height / 2) + (gridToY(startY + 0.5) - endY) / 2.0
+            op.invoke(this)
+        }
     }
 
 }

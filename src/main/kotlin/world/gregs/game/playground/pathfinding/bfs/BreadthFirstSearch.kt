@@ -20,10 +20,7 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
         distances.forEachIndexed { x, it ->
             it.forEachIndexed { y, distance ->
                 if(distance != -1.0) {
-                    canvas.content.text("%.1f".format(distance)) {
-                        textAlignment = TextAlignment.CENTER
-                        this.x = canvas.gridToX(x + 0.5) - (boundsInLocal.width / 2)
-                        this.y = canvas.gridToY(y + 0.5) + (boundsInLocal.height / 2)
+                    canvas.tileText(x, y, "%.1f".format(distance)) {
                         stroke = Color.RED
                     }
                 }
