@@ -81,12 +81,20 @@ Different pre-processing method used
 
 ![](./src/main/resources/images/LineOfSight.png)
 
-## Markov Decision Process (MDP)
+### Distance
 
-### Value Iteration
+The shortest distance between two rectangles
+
+![](./src/main/resources/images/RectangleDistance.png)
+
+## AI
+
+### Markov Decision Process (MDP)
+
+#### Value Iteration
 
 ![](./src/main/resources/images/ValueIteration.png)
 
-### Policy Iteration
+#### Policy Iteration
 
 ![](./src/main/resources/images/PolicyIteration.png)
