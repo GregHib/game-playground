@@ -1,6 +1,7 @@
 package world.gregs.game.playground.ai.iaus.world
 
 import javafx.scene.paint.Color
+import world.gregs.game.playground.ai.iaus.bot.behaviour.Behaviour
 import world.gregs.game.playground.ai.iaus.bot.record.Recorder
 import world.gregs.game.playground.ai.iaus.world.action.Action
 import world.gregs.game.playground.ai.iaus.bot.record.Records
@@ -12,7 +13,8 @@ data class Area(
     val width: Int,
     val height: Int,
     val colour: Color,
-    override val records: Records = Records()
+    override val records: Records = Records(),
+    val behaviours: MutableSet<Behaviour> = mutableSetOf()
 ) : Coordinates, Named, Recorder {
     val actors = mutableListOf<Actor>()
 
@@ -25,5 +27,15 @@ data class Area(
     fun add(actor: Actor) {
         actors.add(actor)
         actor.area = this
+        if (actor is Agent) {
+            actor.reasoner.behaviours.addAll(behaviours)
+        }
+    }
+
+    fun remove(actor: Actor) {
+        actors.remove(actor)
+        if (actor is Agent) {
+            actor.reasoner.behaviours.removeAll(behaviours)
+        }
     }
 }
