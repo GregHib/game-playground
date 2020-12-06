@@ -6,6 +6,7 @@ import world.gregs.game.playground.ai.iaus.PlayerAIView.Companion.speed
 import world.gregs.game.playground.ai.iaus.world.action.Action
 import world.gregs.game.playground.ai.iaus.world.action.Actions
 import world.gregs.game.playground.ai.iaus.bot.Reasoner
+import world.gregs.game.playground.ai.iaus.bot.record.PlayerRecords
 import world.gregs.game.playground.ai.iaus.bot.record.Records
 import world.gregs.game.playground.spatial.sight.Distance.getNearest
 
@@ -19,6 +20,9 @@ data class Agent(
     override lateinit var actions: Actions
     override lateinit var area: Area
     override val records = Records()
+
+    val bag: MutableMap<String, Int>
+        get() = records[PlayerRecords.Bag]
 
     enum class State {
         Idle,
