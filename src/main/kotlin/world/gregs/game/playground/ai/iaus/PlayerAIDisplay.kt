@@ -1,6 +1,5 @@
 package world.gregs.game.playground.ai.iaus
 
-import javafx.scene.input.KeyCode
 import javafx.scene.paint.Color
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
@@ -10,7 +9,6 @@ import tornadofx.launch
 import tornadofx.text
 import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.ai.iaus.bot.*
-import world.gregs.game.playground.ai.iaus.bot.behaviour.BehaviourSet
 import world.gregs.game.playground.ai.iaus.bot.behaviour.SimpleBehaviour
 import world.gregs.game.playground.ai.iaus.bot.record.*
 import world.gregs.game.playground.ai.iaus.bot.record.AreaRecords.*
@@ -61,20 +59,36 @@ class PlayerAIView : View("Player AI view") {
             skill >= required
         }
 
+        val skillEfficiency = consider { agent, obj: GameObject ->
+            obj.getDouble(Skill).scale(0.1, agent.getDouble(Skill))
+        }
+
         val hasTooManyLogs = considerBool { agent, _: Any ->
-            agent.getInt(Logs) >= 4
+            agent.bag.getOrDefault("logs", 0) >= 4
         }
 
         val hasAxe = considerBool { agent, _: Any ->
-            agent[HasAxe]
+            agent.bag.getOrDefault("axe", 0) > 0
         }
 
         val hasNoAxe = considerBool { agent, _: Any ->
-            !agent.getBoolean(HasAxe)
+            agent.bag.getOrDefault("axe", 0) == 0
         }
 
         val choppingMomentum = consider { agent, _: Any ->
             agent.getDouble(ChoppingMomentum)
+        }
+
+        fun goToArea(predicate: (Area) -> Boolean, considerations: Set<Consideration>): SimpleBehaviour {
+            return SimpleBehaviour(
+                name = "go to",
+                targets = { areas.filter(predicate) },
+                considerations = considerations.toMutableSet().apply {
+                    add(distanceTo)
+                },
+                weight = 0.8,
+                action = Action.MoveToArea
+            )
         }
 
         val idle = SimpleBehaviour(
@@ -84,19 +98,15 @@ class PlayerAIView : View("Player AI view") {
             action = Action.Idle
         )
 
-        val findAxeArea = SimpleBehaviour(
-            name = "go to",
-            targets = { _ -> areas.filter { it[HasAxes] } },
+        val findAxeArea = goToArea(
+            predicate = { it[HasAxes] },
             considerations = setOf(
                 hasNoAxe,
                 considerBool { agent, _: Any ->
                     !agent.area.getBoolean(HasAxes)
                 },
-                choppingMomentum,
-                distanceTo
-            ),
-            weight = 0.8,
-            action = Action.MoveToArea
+                choppingMomentum
+            )
         )
 
         val pickupAxe = SimpleBehaviour(
@@ -106,24 +116,21 @@ class PlayerAIView : View("Player AI view") {
                 distanceTo,
                 hasNoAxe,
                 hasSkillToUse,
+                skillEfficiency,
                 choppingMomentum
             ),
             action = Action.Pickup
         )
 
-        val findTreeArea = SimpleBehaviour(
-            name = "go to",
-            targets = { _ -> areas.filter { it[HasTrees] } },
+        val findTreeArea = goToArea(
+            predicate = { it[HasTrees] },
             considerations = setOf(
                 hasAxe,
                 considerBool { agent, _: Any ->
                     !agent.area.getBoolean(HasTrees)
                 },
                 choppingMomentum,
-                distanceTo
-            ),
-            weight = 0.8,
-            action = Action.MoveToArea
+            )
         )
 
         val chopTree = SimpleBehaviour(
@@ -133,23 +140,21 @@ class PlayerAIView : View("Player AI view") {
                 hasAxe,
                 distanceTo,
                 hasSkillToUse,
+                skillEfficiency,
                 choppingMomentum
             ),
             action = Action.Chop
         )
 
-        val findShedArea = SimpleBehaviour(
-            name = "go to",
-            targets = { _ -> areas.filter { it[HasDeposits] } },
+        val findShedArea = goToArea(
+            predicate = { it[HasDeposits] },
             considerations = setOf(
                 hasTooManyLogs,
                 considerBool { agent, _: Any ->
                     !agent.area.getBoolean(HasDeposits)
                 },
-                distanceTo
-            ),
-            weight = 0.8,
-            action = Action.MoveToArea
+                choppingMomentum,
+            )
         )
 
         val depositLogs = SimpleBehaviour(
@@ -175,11 +180,11 @@ class PlayerAIView : View("Player AI view") {
     }
 
     private fun setupWorld() {
-        forest.add(GameObject("small tree", 10, 13, Color.GREEN, Records(Skill to 0)))
+        forest.add(GameObject("small tree", 10, 13, Color.GREEN, Records(Skill to 1)))
         forest.add(GameObject("medium tree", 15, 14, Color.GREEN, Records(Skill to 5)))
         forest.add(GameObject("large tree", 14, 11, Color.GREEN, Records(Skill to 10)))
         forest.add(GameObject("giant tree", 11, 11, Color.GREEN, Records(Skill to 20)))
-        shop.add(GameObject("small axe", 23, 3, Color.ORANGE, Records(Skill to 0)))
+        shop.add(GameObject("small axe", 23, 3, Color.ORANGE, Records(Skill to 1)))
         shop.add(GameObject("medium axe", 20, 3, Color.ORANGE, Records(Skill to 10)))
         shop.add(GameObject("large axe", 25, 4, Color.ORANGE, Records(Skill to 15)))
         shed.add(GameObject("store", 22, 12, Color.BROWN))
@@ -200,7 +205,7 @@ class PlayerAIView : View("Player AI view") {
         provider.obj<Agent>(Action.Pickup) { agent: Agent, obj: GameObject ->
             obj.area.actors.remove(obj)
             if (obj.name.contains("axe", true)) {
-                agent.records[HasAxe] = true
+                agent.bag["axe"] = agent.bag.getOrDefault("axe", 0) + 1
                 if (obj.area == shop) {
                     GlobalScope.launch {
                         delay(speed * 50)
@@ -212,18 +217,17 @@ class PlayerAIView : View("Player AI view") {
 
         provider.obj<Agent>(Action.DepositLogs) { agent, _ ->
             delay(speed * 10)
-            agent.records[Logs] = 0
+            agent.bag["logs"] = 0
         }
 
         provider.obj<Agent>(Action.Chop) { agent, target ->
             delay(speed * 10)
             target.colour = Color.BROWN
-            val logCount: Int = agent.records[Logs]
-            agent.records[Logs] = logCount + 1
+            agent.bag["logs"] = agent.bag.getOrDefault("logs", 0) + 1
             agent.records[Skill] = agent.getInt(Skill) + 1
             agent.records[ChoppingMomentum] = (agent.getDouble(ChoppingMomentum) + 0.01).coerceAtMost(1.0)
             if (Random.nextBoolean()) {
-                agent.records[HasAxe] = false
+                agent.bag["axe"] = 0
             }
             GlobalScope.launch {
                 delay(Random.nextLong(speed * 40, speed * 50))
@@ -250,14 +254,27 @@ class PlayerAIView : View("Player AI view") {
         }
     }
 
+    private fun GridCanvas<Boolean, BooleanGrid>.text(s: String, column: Int) {
+        content.text(s) {
+            this.x = -boundsInLocal.width - 5
+            this.y = boundsInLocal.height * (column + 1)
+            strokeWidth = 1.0
+            stroke = Color.WHITE
+        }
+    }
+
     suspend fun GridCanvas<Boolean, BooleanGrid>.reload() = withContext(Dispatchers.JavaFx) {
         reloadGrid()
-        text("Has axe: ${agent.getBoolean(HasAxe)}", 0, 0)
-        text("Logs: ${agent.getInt(Logs)}", 0, 1)
-        text("Skill: ${agent.getInt(Skill)}", 1, 0)
+
+        text("Bag:", 0)
+        var index = 1
+        agent.bag.forEach { (key, value) ->
+            text("$key: $value", index++)
+        }
+        text("Skill: ${agent.getInt(Skill)}", 0, 0)
         val currentChoice = agent.reasoner.behaviours.current
-        text("Behaviour: ${currentChoice?.behaviour?.name ?: "none"} ${currentChoice?.target?.name ?: ""}", 2, 0)
-        text("State: ${agent.actorState}", 2, 1)
+        text("Behaviour: ${currentChoice?.behaviour?.name ?: "none"} ${currentChoice?.target?.name ?: ""}", 1, 0)
+        text("State: ${agent.actorState}", 1, 1)
 
         content.text("X: $mouseX Y: $mouseY") {
             this.x = boundary.width.toDouble() - boundsInLocal.width
