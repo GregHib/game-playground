@@ -1,6 +1,7 @@
 package world.gregs.game.playground.ui.zoom
 
 import javafx.event.EventTarget
+import javafx.geometry.VPos
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
@@ -100,24 +101,38 @@ class GridCanvas<T : Any, G : Grid<T>>(
         content.line(gridToX(startX + 0.5), gridToY(startY + 0.5), gridToX(endX + 0.5), gridToY(endY + 0.5), op)
     }
 
-    fun line(startX: Int, startY: Int, endX: Int, endY: Int, op: Line.() -> Unit = {}) {
-        content.line(gridToX(startX), gridToY(startY), gridToX(endX), gridToY(endY), op)
+    /*
+        Why are there two text methods?
+        What is the difference? Works on some grids but not for others; must be due to gridToY being wrong.
+     */
+    fun text(startX: Int, startY: Int, value: String, op: Text.() -> Unit = {}) {
+        text(startX, startY, startX + 1, startY, value, op)
+    }
+
+    fun text(startX: Int, startY: Int, endX: Int, endY: Int, value: String, op: Text.() -> Unit = {}) {
+        content.text(value) {
+            textAlignment = TextAlignment.CENTER
+            textOrigin = VPos.TOP
+            this.x = -boundsInLocal.width / 2.0 + gridToX(startX) + (gridToX(endX) - gridToX(startX)) / 2.0
+            this.y = -boundsInLocal.height / 2.0 + gridToY(startY + 1) + (gridToY(endY) - gridToY(startY)) / 2.0
+            op.invoke(this)
+        }
     }
 
     fun tileText(startX: Int, startY: Int, value: String, op: Text.() -> Unit = {}) {
-        content.text(value) {
-            textAlignment = TextAlignment.CENTER
-            this.x = gridToX(startX + 0.5) - (boundsInLocal.width / 2)
-            this.y = gridToY(startY + 0.5) + (boundsInLocal.height / 4)
-            op.invoke(this)
-        }
+        tileText(startX, startY, startX + 1, startY + 1, value, op)
     }
 
     fun tileText(startX: Int, startY: Int, endX: Int, endY: Int, value: String, op: Text.() -> Unit = {}) {
         content.text(value) {
             textAlignment = TextAlignment.CENTER
-            this.x = gridToX(endX) - (boundsInLocal.width / 2) + (gridToX(startX) - gridToX(endX)) / 2.0
-            this.y = gridToY(endY + 0.5) + (boundsInLocal.height / 2) + (gridToY(startY) - gridToY(endY)) / 2.0
+            textOrigin = VPos.TOP
+            val flipHorizontal = endX < startX
+            val flipVertical = endY < startY
+            wrappingWidth = tileWidth.toDouble() * if (flipHorizontal) startX - endX else endX - startX
+            prefWidth = wrappingWidth
+            this.x = gridToX(if (flipHorizontal) endX else startX)
+            this.y = gridToY(1 + if (flipVertical) endY else startY)
             op.invoke(this)
         }
     }
