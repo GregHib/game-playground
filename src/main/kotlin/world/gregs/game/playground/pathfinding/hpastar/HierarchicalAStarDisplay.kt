@@ -237,7 +237,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
                                         root.tileLine(a.x, a.y, b.x, b.y) {
                                             stroke = Color.RED
                                         }
-                                        root.tileText(a.x, a.y, b.x, b.y, distance.toString()) {
+                                        root.text(a.x, a.y, b.x, b.y, distance.toString()) {
                                             stroke = Color.BLUE
                                         }
                                     }

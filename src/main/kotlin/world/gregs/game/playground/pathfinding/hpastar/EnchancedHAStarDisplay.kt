@@ -201,7 +201,7 @@ class EnhancedHAStarView : View("EnhancedHAStar") {
                             root.tileLine(node.x, node.y, x, y) {
                                 stroke = Color.RED
                             }
-                            root.tileText(node.x, node.y, x, y, distance.toString()) {
+                            root.text(node.x, node.y, x, y, distance.toString()) {
                                 stroke = Color.BLUE
                             }
                             directedGraph.addEdge(node, b)

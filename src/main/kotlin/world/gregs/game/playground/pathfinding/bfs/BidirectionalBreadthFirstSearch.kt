@@ -25,7 +25,7 @@ class BidirectionalBreadthFirstSearch(private val directions: Array<Direction>) 
             val y = index / width
             val distance = getDistance(hash)
             if (distance != -1) {
-                canvas.tileText(x, y, distance.toString()) {
+                canvas.text(x, y, distance.toString()) {
                     stroke = Color.RED
                 }
             }
@@ -67,7 +67,7 @@ class BidirectionalBreadthFirstSearch(private val directions: Array<Direction>) 
                 path.forEach {
                     val x = it % width
                     val y = it / width
-                    canvas.tileText(x, y, "[      ]") {
+                    canvas.text(x, y, "[      ]") {
                         stroke = Color.ORANGE
                     }
                 }

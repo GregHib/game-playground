@@ -58,7 +58,7 @@ class DistanceView : View("Distance view") {
                 stroke = Color.ORANGE
             }
             val distance = chebyshev(startX, startY, endX, endY)
-            tileText(startX, startY, endX, endY, distance.toString()) {
+            text(startX, startY, endX, endY, distance.toString()) {
                 stroke = Color.BLACK
             }
         }
