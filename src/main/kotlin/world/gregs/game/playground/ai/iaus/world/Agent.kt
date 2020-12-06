@@ -2,6 +2,7 @@ package world.gregs.game.playground.ai.iaus.world
 
 import javafx.scene.paint.Color
 import kotlinx.coroutines.*
+import world.gregs.game.playground.ai.iaus.PlayerAIView.Companion.speed
 import world.gregs.game.playground.ai.iaus.world.action.Action
 import world.gregs.game.playground.ai.iaus.world.action.Actions
 import world.gregs.game.playground.ai.iaus.bot.Reasoner
@@ -44,7 +45,7 @@ data class Agent(
             if (y != targetY) {
                 y += (targetY - y).coerceIn(-1, 1)
             }
-            delay(100)
+            delay(speed)
         }
         actorState = previousState
     }
@@ -80,7 +81,7 @@ data class Agent(
             return
         }
         job?.cancel()
-        job = GlobalScope.launch {
+        job = GlobalScope.launch(Dispatchers.Main) {
             this@Agent.actorState = state
             block.invoke()
             this@Agent.actorState = State.Idle

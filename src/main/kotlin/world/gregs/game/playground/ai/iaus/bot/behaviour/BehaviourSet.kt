@@ -1,5 +1,6 @@
 package world.gregs.game.playground.ai.iaus.bot.behaviour
 
+import world.gregs.game.playground.ai.iaus.PlayerAIView.Companion.debug
 import world.gregs.game.playground.ai.iaus.bot.Choice
 import world.gregs.game.playground.ai.iaus.world.Agent
 
@@ -16,13 +17,20 @@ class BehaviourSet(
     }
 
     fun select(agent: Agent): Choice? {
-//        println("Selecting behaviour from ${set.map { it.name }}")
+        if (debug) {
+            println("Selecting behaviour from ${set.map { it.name }}")
+        }
         val choice = set.fold(null as Choice?) { highest, behaviour ->
             val target = behaviour.getHighestTarget(agent, highest?.score ?: 0.0, last?.behaviour)
-//            println("Highest target for ${behaviour.name} ${target?.target?.name ?: "none"} ${target?.score ?: 0.0}")
+            if (debug) {
+                println("Highest target for ${behaviour.name} ${target?.target?.name ?: "none"} ${target?.score ?: 0.0}")
+            }
             target ?: highest
         }
         update(choice)
         return current
+    }
+
+    companion object {
     }
 }

@@ -1,5 +1,6 @@
 package world.gregs.game.playground.ai.iaus.bot.behaviour
 
+import world.gregs.game.playground.ai.iaus.PlayerAIView.Companion.debug
 import world.gregs.game.playground.ai.iaus.world.action.Action
 import world.gregs.game.playground.ai.iaus.bot.Choice
 import world.gregs.game.playground.ai.iaus.bot.Consideration
@@ -49,6 +50,9 @@ interface Behaviour : Named {
             }
 
             val score = score(agent, target, last)
+            if (debug) {
+                println("Check target ${target.name} $score")
+            }
             if (score > highest) {
                 highest = score
                 topChoice = target

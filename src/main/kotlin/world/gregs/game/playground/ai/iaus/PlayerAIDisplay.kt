@@ -1,5 +1,6 @@
 package world.gregs.game.playground.ai.iaus
 
+import javafx.scene.input.KeyCode
 import javafx.scene.paint.Color
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
@@ -9,6 +10,7 @@ import tornadofx.launch
 import tornadofx.text
 import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.ai.iaus.bot.*
+import world.gregs.game.playground.ai.iaus.bot.behaviour.BehaviourSet
 import world.gregs.game.playground.ai.iaus.bot.behaviour.SimpleBehaviour
 import world.gregs.game.playground.ai.iaus.bot.record.*
 import world.gregs.game.playground.ai.iaus.bot.record.AreaRecords.*
@@ -30,6 +32,9 @@ class PlayerAIView : View("Player AI view") {
     companion object {
         private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
+        private const val maxDistance = 100.0
+        const val speed = 10L
+        var debug = false
     }
 
     private val agent = Agent("player", 0, 0, Color.BLUE)
@@ -47,7 +52,7 @@ class PlayerAIView : View("Player AI view") {
         setupActionHandlers()
 
         val distanceTo = consider { agent, obj: Coordinates ->
-            chebyshev(agent.x, agent.y, obj.x, obj.y).scale(0.0, 100.0).inverse()
+            chebyshev(agent.x, agent.y, obj.x, obj.y).scale(0.0, maxDistance).inverse()
         }
 
         val hasSkillToUse = considerBool { agent, obj: GameObject ->
@@ -74,7 +79,8 @@ class PlayerAIView : View("Player AI view") {
 
         val idle = SimpleBehaviour(
             name = "idle",
-            weight = 0.1,
+            weight = 0.001,
+            momentum = 1.0,
             action = Action.Idle
         )
 
@@ -156,14 +162,15 @@ class PlayerAIView : View("Player AI view") {
             action = Action.DepositLogs
         )
 
+        shop.behaviours.add(pickupAxe)
+        forest.behaviours.add(chopTree)
+        shed.behaviours.add(depositLogs)
+
         agent.reasoner.behaviours.apply {
             add(idle)
             add(findAxeArea)
-            add(pickupAxe)
             add(findTreeArea)
-            add(chopTree)
             add(findShedArea)
-            add(depositLogs)
         }
     }
 
@@ -176,7 +183,7 @@ class PlayerAIView : View("Player AI view") {
         shop.add(GameObject("medium axe", 20, 3, Color.ORANGE, Records(Skill to 10)))
         shop.add(GameObject("large axe", 25, 4, Color.ORANGE, Records(Skill to 15)))
         shed.add(GameObject("store", 22, 12, Color.BROWN))
-        shed.add(GameObject("store2", 25, 12, Color.BROWN))
+        shed.add(GameObject("store", 25, 12, Color.BROWN))
         world.add(agent)
 
         forest.records[HasTrees] = true
@@ -186,7 +193,8 @@ class PlayerAIView : View("Player AI view") {
 
     private fun setupActionHandlers() {
         provider.area<Agent>(Action.MoveToArea) { agent: Agent, area: Area ->
-            agent.area = area
+            agent.area.remove(agent)
+            area.add(agent)
         }
 
         provider.obj<Agent>(Action.Pickup) { agent: Agent, obj: GameObject ->
@@ -195,7 +203,7 @@ class PlayerAIView : View("Player AI view") {
                 agent.records[HasAxe] = true
                 if (obj.area == shop) {
                     GlobalScope.launch {
-                        delay(5000)
+                        delay(speed * 50)
                         obj.area.actors.add(obj)
                     }
                 }
@@ -203,21 +211,22 @@ class PlayerAIView : View("Player AI view") {
         }
 
         provider.obj<Agent>(Action.DepositLogs) { agent, _ ->
-            delay(1000)
+            delay(speed * 10)
             agent.records[Logs] = 0
         }
 
         provider.obj<Agent>(Action.Chop) { agent, target ->
-            delay(1000)
+            delay(speed * 10)
             target.colour = Color.BROWN
             val logCount: Int = agent.records[Logs]
             agent.records[Logs] = logCount + 1
             agent.records[Skill] = agent.getInt(Skill) + 1
-            if (logCount == 1) {
+            agent.records[ChoppingMomentum] = (agent.getDouble(ChoppingMomentum) + 0.01).coerceAtMost(1.0)
+            if (Random.nextBoolean()) {
                 agent.records[HasAxe] = false
             }
             GlobalScope.launch {
-                delay(Random.nextLong(4000, 5000))
+                delay(Random.nextLong(speed * 40, speed * 50))
                 target.colour = Color.GREEN
             }
         }
@@ -232,31 +241,24 @@ class PlayerAIView : View("Player AI view") {
     private var mouseX = 0
     private var mouseY = 0
 
+    private fun GridCanvas<Boolean, BooleanGrid>.text(s: String, row: Int, column: Int) {
+        content.text(s) {
+            this.x = row * 75.0
+            this.y = boundary.height.toDouble() + boundsInLocal.height * (column + 1)
+            strokeWidth = 1.0
+            stroke = Color.WHITE
+        }
+    }
+
     suspend fun GridCanvas<Boolean, BooleanGrid>.reload() = withContext(Dispatchers.JavaFx) {
         reloadGrid()
-        listOf(
-            "Has axe: ${agent.getBoolean(HasAxe)}",
-            "Logs: ${agent.getInt(Logs)}",
-        ).forEachIndexed { index, s ->
-            content.text(s) {
-                this.x = 0.0
-                this.y = boundary.height.toDouble() + boundsInLocal.height * (index + 1)
-                strokeWidth = 1.0
-                stroke = Color.WHITE
-            }
-        }
+        text("Has axe: ${agent.getBoolean(HasAxe)}", 0, 0)
+        text("Logs: ${agent.getInt(Logs)}", 0, 1)
+        text("Skill: ${agent.getInt(Skill)}", 1, 0)
         val currentChoice = agent.reasoner.behaviours.current
-        listOf(
-            "Behaviour: ${currentChoice?.behaviour?.name ?: "none"} ${currentChoice?.target?.name ?: ""}",
-            "State: ${agent.actorState}",
-        ).forEachIndexed { index, s ->
-            content.text(s) {
-                this.x = 100.0
-                this.y = boundary.height.toDouble() + boundsInLocal.height * (index + 1)
-                strokeWidth = 1.0
-                stroke = Color.WHITE
-            }
-        }
+        text("Behaviour: ${currentChoice?.behaviour?.name ?: "none"} ${currentChoice?.target?.name ?: ""}", 2, 0)
+        text("State: ${agent.actorState}", 2, 1)
+
         content.text("X: $mouseX Y: $mouseY") {
             this.x = boundary.width.toDouble() - boundsInLocal.width
             this.y = boundary.height.toDouble() + boundsInLocal.height
@@ -295,19 +297,16 @@ class PlayerAIView : View("Player AI view") {
         content.prefWidth = boundary.width.toDouble()
         content.prefHeight = boundary.height.toDouble()
 
-        var start = false
-        GlobalScope.launch {
+        var start = true
+        GlobalScope.launch(Dispatchers.Main) {
             while (true) {
-                if (start) {
-                    agent.reasoner.tick()
+                if (!start) {
+                    continue
                 }
+                agent.reasoner.tick()
                 reload()
-                delay(100)
+                delay(speed)
             }
-        }
-
-        content.setOnMouseClicked {
-            start = !start
         }
 
         content.setOnMouseMoved {
