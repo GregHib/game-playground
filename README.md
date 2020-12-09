@@ -49,7 +49,11 @@ Different pre-processing method used
 
 ## Spatial
 
-### Region grouping
+### DBSCAN Point clustering
+
+![](./src/main/resources/images/DBSCANClustering.png)
+
+### Connected region grouping
 
 ![](./src/main/resources/images/RegionGrouping.png)
 
