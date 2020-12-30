@@ -21,7 +21,7 @@ class BreadthFirstSearchView : View("Breadth first search") {
     private lateinit var start: Node
     private val bfs = BreadthFirstSearch(Direction.values())
 
-    override val root = grid(16, 16, PADDING, PADDING) {
+    override val root = grid(32, 32, PADDING, PADDING) {
         prefWidth = boundary.width + PADDING
         prefHeight = boundary.height + PADDING
         content.prefWidth = boundary.width.toDouble()
