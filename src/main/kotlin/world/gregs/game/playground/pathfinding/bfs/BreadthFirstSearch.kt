@@ -1,12 +1,9 @@
 package world.gregs.game.playground.pathfinding.bfs
 
 import javafx.scene.paint.Color
-import javafx.scene.text.TextAlignment
-import tornadofx.text
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Grid
 import world.gregs.game.playground.Node
-import world.gregs.game.playground.pathfinding.jps.JPSFinder.Companion.octile
 import world.gregs.game.playground.ui.zoom.GridCanvas
 import world.gregs.game.playground.ui.zoom.SolidGrid
 import java.awt.Rectangle
@@ -16,7 +13,7 @@ import kotlin.system.measureNanoTime
 class BreadthFirstSearch(private val directions: Array<Direction>) {
 
     fun displaySearch(canvas: GridCanvas<*, *>, start: Node) {
-        val distances = searchN(canvas.grid, start)
+        val distances = searchNOptimised(canvas.grid, start)
         distances.forEachIndexed { x, it ->
             it.forEachIndexed { y, distance ->
                 if(distance != -1.0) {
@@ -47,6 +44,50 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
                 }
             }
 //        }}")
+        return distances
+    }
+
+    fun getX(id: Int) = id shr 14
+    fun getY(id: Int) = id and 0x3fff
+
+    fun searchNOptimised(grid: Grid<*>, start: Node): Array<Array<Double>> {
+        val distances = Array(grid.columns) { Array(grid.rows) { -1.0 } }
+        val startInt = start.pos
+        val startX = start.x
+        val startY = start.y
+        val columns = grid.columns
+        val rows = grid.rows
+        val collision = grid as SolidGrid
+        val queue = IntArray(columns * rows) { -1 }
+        var writeIndex = 0
+        var readIndex = 0
+        println("BFS took ${measureNanoTime {
+                readIndex = 0
+                writeIndex = 0
+                queue[writeIndex++] = startInt
+                distances[startX][startY] = 0.0
+                while (readIndex < writeIndex) {
+                    val parent = queue[readIndex++]
+                    val parentX = getX(parent)
+                    val parentY = getY(parent)
+                    if (parentX in 0 until rows && parentY + 1 in 0 until columns && !collision.blocked(parentX, parentY + 1) && distances[parentX][parentY + 1] == -1.0) {
+                        distances[parentX][parentY + 1] = distances[parentX][parentY] + 1.0
+                        queue[writeIndex++] = (parentY + 1) + (parentX shl 14)
+                    }
+                    if (parentX + 1 in 0 until rows && parentY in 0 until columns && !collision.blocked(parentX + 1, parentY) && distances[parentX + 1][parentY] == -1.0) {
+                        distances[parentX + 1][parentY] = distances[parentX][parentY] + 1.0
+                        queue[writeIndex++] = parentY + ((parentX + 1) shl 14)
+                    }
+                    if (parentX in 0 until rows && parentY - 1 in 0 until columns && !collision.blocked(parentX, parentY - 1) && distances[parentX][parentY - 1] == -1.0) {
+                        distances[parentX][parentY - 1] = distances[parentX][parentY] + 1.0
+                        queue[writeIndex++] = (parentY - 1) + (parentX shl 14)
+                    }
+                    if (parentX - 1 in 0 until rows && parentY in 0 until columns && !collision.blocked(parentX - 1, parentY) && distances[parentX - 1][parentY] == -1.0) {
+                        distances[parentX - 1][parentY] = distances[parentX][parentY] + 1.0
+                        queue[writeIndex++] = parentY + ((parentX - 1) shl 14)
+                    }
+                }
+        }}")
         return distances
     }
 
