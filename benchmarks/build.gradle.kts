@@ -26,6 +26,10 @@ allOpen {
     annotation("org.openjdk.jmh.annotations.State")
 }
 
+jmh {
+    duplicateClassesStrategy = DuplicatesStrategy.WARN
+}
+
 repositories {
     mavenCentral()
     jcenter()
