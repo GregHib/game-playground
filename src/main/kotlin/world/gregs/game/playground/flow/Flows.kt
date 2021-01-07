@@ -1,8 +1,7 @@
 package world.gregs.game.playground.flow
 
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 object Flows {
     /*
@@ -29,8 +28,46 @@ object Flows {
     data class LeftRegion(val id: Int) : Action
     interface Action
 
+    fun Flow<Any>.launch(dispatcher: CoroutineDispatcher = Dispatchers.Default) = CoroutineScope(dispatcher).launch {
+        collect() // tail-call
+    }
+
+    class MutableFlowList() {
+        val map = mutableMapOf<StateFlow<Int>, Job>()
+        val shared = MutableSharedFlow<Int>(extraBufferCapacity = 0xffff)
+
+        fun add(flow: StateFlow<Int>) {
+            val job = flow.onEach {
+                this.shared.emit(it)
+            }.launch()
+            map[flow] = job
+        }
+
+        fun remove(flow: StateFlow<Int>) {
+            map[flow]?.cancel()
+        }
+    }
+
     @JvmStatic
     fun main(args: Array<String>) = runBlocking<Unit> {
+
+        runBlocking {
+            val list = MutableFlowList()
+            list.shared.onEach {
+                println("Emitted $it")
+            }.launch()
+
+            delay(10)
+            val one = MutableStateFlow(-1)
+            list.add(one)
+            val two = MutableStateFlow(-1)
+            list.add(two)
+            one.emit(1)
+            two.emit(2)
+            list.remove(two)
+            one.emit(3)
+            two.emit(4)
+        }
         val flow = MutableStateFlow<Action>(value = Idle)
         val regionChanges = flow
             .filterIsInstance<Move>()
