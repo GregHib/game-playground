@@ -52,12 +52,12 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
 
     fun searchNOptimised(grid: Grid<*>, start: Node): Array<Array<Double>> {
         val distances = Array(grid.columns) { Array(grid.rows) { -1.0 } }
+        val collision = Array(grid.columns) { x -> Array(grid.rows) { y -> (grid as SolidGrid).blocked(x, y) } }
         val startInt = start.pos
         val startX = start.x
         val startY = start.y
         val columns = grid.columns
         val rows = grid.rows
-        val collision = grid as SolidGrid
         val queue = IntArray(columns * rows) { -1 }
         var writeIndex = 0
         var readIndex = 0
@@ -70,19 +70,19 @@ class BreadthFirstSearch(private val directions: Array<Direction>) {
                     val parent = queue[readIndex++]
                     val parentX = getX(parent)
                     val parentY = getY(parent)
-                    if (parentX in 0 until rows && parentY + 1 in 0 until columns && !collision.blocked(parentX, parentY + 1) && distances[parentX][parentY + 1] == -1.0) {
+                    if (collision.getOrNull(parentX)?.getOrNull(parentY + 1) == false && distances[parentX][parentY + 1] == -1.0) {
                         distances[parentX][parentY + 1] = distances[parentX][parentY] + 1.0
                         queue[writeIndex++] = (parentY + 1) + (parentX shl 14)
                     }
-                    if (parentX + 1 in 0 until rows && parentY in 0 until columns && !collision.blocked(parentX + 1, parentY) && distances[parentX + 1][parentY] == -1.0) {
+                    if (collision.getOrNull(parentX + 1)?.getOrNull(parentY) == false && distances[parentX + 1][parentY] == -1.0) {
                         distances[parentX + 1][parentY] = distances[parentX][parentY] + 1.0
                         queue[writeIndex++] = parentY + ((parentX + 1) shl 14)
                     }
-                    if (parentX in 0 until rows && parentY - 1 in 0 until columns && !collision.blocked(parentX, parentY - 1) && distances[parentX][parentY - 1] == -1.0) {
+                    if (collision.getOrNull(parentX)?.getOrNull(parentY - 1) == false && distances[parentX][parentY - 1] == -1.0) {
                         distances[parentX][parentY - 1] = distances[parentX][parentY] + 1.0
                         queue[writeIndex++] = (parentY - 1) + (parentX shl 14)
                     }
-                    if (parentX - 1 in 0 until rows && parentY in 0 until columns && !collision.blocked(parentX - 1, parentY) && distances[parentX - 1][parentY] == -1.0) {
+                    if (collision.getOrNull(parentX - 1)?.getOrNull(parentY) == false && distances[parentX - 1][parentY] == -1.0) {
                         distances[parentX - 1][parentY] = distances[parentX][parentY] + 1.0
                         queue[writeIndex++] = parentY + ((parentX - 1) shl 14)
                     }

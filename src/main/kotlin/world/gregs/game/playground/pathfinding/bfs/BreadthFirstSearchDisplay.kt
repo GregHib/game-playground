@@ -19,9 +19,15 @@ class BreadthFirstSearchView : View("Breadth first search") {
     }
 
     private lateinit var start: Node
-    private val bfs = BreadthFirstSearch(Direction.values())
+    private val collisions = object : Collisions {
+        override fun blocked(fromX: Int, fromY: Int, toX: Int, toY: Int, direction: Int, z: Int): Boolean {
+            return root.grid.get(toX, toY) ?: false
+        }
+    }
 
-    override val root = grid(32, 32, PADDING, PADDING) {
+    private val bfs = UnsafeBreadthFirstSearch(collisions, UnsafeBreadthFirstSearch.getUnsafe(), 8, 8)
+
+    override val root = grid(8, 8, PADDING, PADDING) {
         prefWidth = boundary.width + PADDING
         prefHeight = boundary.height + PADDING
         content.prefWidth = boundary.width.toDouble()
@@ -35,10 +41,32 @@ class BreadthFirstSearchView : View("Breadth first search") {
 
         fun reload() {
             reloadGrid()
-            tile(start.x, start.y) {
-                fill = Color.GREEN
+            for(x in 0 until columns) {
+                for (y in 0 until rows) {
+//                    BFS.collision[x, y] = grid.get(x, y)!!
+//                    BFS2.collision[x][y] = grid.get(x, y)!!
+                }
             }
-            bfs.displaySearch(this, start)
+//
+            for(x in 0 until columns) {
+                for(y in 0 until rows) {
+//                    if(BFS.distances[x, y] >= 0.0) {
+//                        tile(x, y) {
+//                            fill = Color.rgb(128, 0, 0, 1.0)
+//                        }
+//                    }
+//                    if(BFS2.distances[x][y] >= 0.0) {
+//                        tile(x, y) {
+//                            fill = Color.rgb(0, 0, 128, 0.25)
+//                        }
+//                    }
+//                    if(BFS.distances[x, y] >= 0.0 && BFS2.distances[x][y] < 0.0) {
+//                        tile(x, y) {
+//                            fill = Color.rgb(128, 0, 0, 1.0)
+//                        }
+//                    }
+                }
+            }
         }
 
         randomise()
