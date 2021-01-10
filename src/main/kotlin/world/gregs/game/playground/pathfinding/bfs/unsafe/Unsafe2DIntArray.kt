@@ -7,51 +7,56 @@ class Unsafe2DIntArray(
     private val width: Int,
     private val height: Int
 ) {
-    private val bytes = (width * height) * 4L
-    private val address = unsafe.allocateMemory(bytes)
-    private val resetAddress = unsafe.allocateMemory(bytes + 4L)
+    private val address = unsafe.allocateMemory(index(width * height))
+    private var default: Int = -1
 
-    private fun offset(x: Int, y: Int): Long = (x + (y * width)) * 4L
+    private fun index(value: Int) = value * 4L
+    private fun hash(x: Int, y: Int): Long = index(x + (y * width))
 
+    /**
+     * Set value at [x], [y]
+     * @throws [IndexOutOfBoundsException] if out of bounds
+     */
     operator fun set(x: Int, y: Int, value: Int) {
-        if (x >= width || x < 0) {
+        if (x < 0 || x >= width) {
             throw IndexOutOfBoundsException("X coordinate $x is not within bounds: $width.")
         }
-        if (y >= height || y < 0) {
+        if (y < 0 || y >= height) {
             throw IndexOutOfBoundsException("Y coordinate $y is not within bounds: $height.")
         }
-        unsafe.putInt(address + offset(x, y), value)
+        unsafe.putInt(address + hash(x, y), value)
     }
 
+    /**
+     * Get value stored at [x], [y] or [default] if out of bounds
+     */
     operator fun get(x: Int, y: Int): Int {
-        if (outOfBounds(x, y)) {
-            return unsafe.getInt(resetAddress + bytes)
+        if (x < 0 || y < 0 || x >= width || y >= height) {
+            return default
         }
-        return unsafe.getInt(address + offset(x, y))
+        return unsafe.getInt(address + hash(x, y))
     }
 
-    fun outOfBounds(x: Int, y: Int) = x < 0 || y < 0 || x >= width || y >= height
-
-    fun setDefault(value: Int) {
+    /**
+     * Fills the array with [value]
+     */
+    fun fill(value: Int) {
         repeat(width * height) {
-            setDefault(it, value)
+            unsafe.putInt(address + index(it), value)
         }
     }
 
-    fun setDefault(index: Int, value: Int) {
-        unsafe.putInt(resetAddress + (index * 4), value)
+    /**
+     * Set the default value to return when out of bounds
+     */
+    fun setDefault(value: Int) {
+        default = value
     }
 
-    fun setOutOfBounds(value: Int) {
-        unsafe.putInt(resetAddress + bytes, value)
-    }
-
-    fun reset() {
-        unsafe.copyMemory(resetAddress, address, bytes)
-    }
-
-    fun clear() {
+    /**
+     * Frees allocated memory
+     */
+    fun free() {
         unsafe.freeMemory(address)
     }
-
 }

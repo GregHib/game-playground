@@ -6,4 +6,5 @@ interface Collisions {
      * @param direction 0..7 - w, e, s, n, sw, se, nw, ne
      */
     fun blocked(fromX: Int, fromY: Int, toX: Int, toY: Int, direction: Int, z: Int = -1): Boolean
+    fun blocked(from: Int, to: Int, direction: Int, z: Int = -1): Boolean
 }

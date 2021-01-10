@@ -14,7 +14,7 @@ import tornadofx.*
 import world.gregs.game.playground.BooleanGrid
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
-import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
+import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearchOld
 import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
@@ -35,7 +35,7 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
     }
 
     private lateinit var content: Pane
-    private val bfs = BreadthFirstSearch(Direction.cardinal)
+    private val bfs = BreadthFirstSearchOld(Direction.cardinal)
     val directedGraph = SimpleWeightedGraph<Node, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
     private val pht = PhTree13<Int>(2)
     val nodes = mutableMapOf<Int, Node>()

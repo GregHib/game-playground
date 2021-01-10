@@ -6,7 +6,7 @@ import tornadofx.View
 import tornadofx.launch
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
-import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
+import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearchOld
 import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
@@ -20,7 +20,7 @@ class FloodFillView : View("Flood fill") {
     }
 
     private lateinit var start: Node
-    private val bfs = BreadthFirstSearch(Direction.values())
+    private val bfs = BreadthFirstSearchOld(Direction.values())
 
     override val root = grid(16, 16, PADDING, PADDING) {
         prefWidth = boundary.width + PADDING

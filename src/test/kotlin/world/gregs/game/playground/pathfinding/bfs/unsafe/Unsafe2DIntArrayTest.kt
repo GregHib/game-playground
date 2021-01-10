@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import sun.misc.Unsafe
-import world.gregs.game.playground.pathfinding.bfs.UnsafeBreadthFirstSearch
 
 internal class Unsafe2DIntArrayTest {
 
@@ -17,13 +16,13 @@ internal class Unsafe2DIntArrayTest {
 
     @BeforeEach
     fun setup() {
-        unsafe = UnsafeBreadthFirstSearch.getUnsafe()
+        unsafe = Memory.getUnsafe()
         array = Unsafe2DIntArray(unsafe, width, height)
     }
 
     @AfterEach
     fun tearDown() {
-        array.clear()
+        array.free()
     }
 
     @Test
@@ -43,15 +42,14 @@ internal class Unsafe2DIntArrayTest {
     }
 
     @Test
-    fun `Reset all values`() {
+    fun `Fill all values`() {
         var counter = 0
         for (x in 0 until width) {
             for (y in 0 until height) {
                 array[x, y] = counter++
             }
         }
-        array.setDefault(-1)
-        array.reset()
+        array.fill(-1)
         for (x in 0 until width) {
             for (y in 0 until height) {
                 assertEquals(-1, array[x, y])
@@ -87,7 +85,7 @@ internal class Unsafe2DIntArrayTest {
 
     @Test
     fun `Out of bounds x value returns default`() {
-        array.setOutOfBounds(-1)
+        array.setDefault(-1)
         assertEquals(-1, array[-10, 0])
         assertEquals(-1, array[width, 0])
         assertEquals(-1, array[width + 100, 0])
@@ -95,7 +93,7 @@ internal class Unsafe2DIntArrayTest {
 
     @Test
     fun `Out of bounds y value returns default`() {
-        array.setOutOfBounds(-1)
+        array.setDefault(-1)
         assertEquals(-1, array[0, -10])
         assertEquals(-1, array[0, height])
         assertEquals(-1, array[0, height + 100])

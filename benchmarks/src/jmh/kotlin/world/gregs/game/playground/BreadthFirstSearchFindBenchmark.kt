@@ -16,12 +16,18 @@ import kotlin.random.Random
 @Fork(1)
 @Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 1, time = 6, timeUnit = TimeUnit.SECONDS)
-class BreadthFirstSearchBenchmark {
+class BreadthFirstSearchFindBenchmark {
     @Param(/*"32", "64", "104", */"128")
     var size = 0
 
     @Param("0", "1", "2", "3", "4", "5")
     var test = 0
+
+    @Param("5", "15"/*, "75", "100", "125"*/)
+    var targetDistance = 0
+
+    @Param("50", "80"/*, "90", "100", "110"*/, "120")
+    var maxPathLength = 0
 
     lateinit var collisionData: BitSet
     lateinit var collisions: Collisions
@@ -31,15 +37,27 @@ class BreadthFirstSearchBenchmark {
     @Setup
     fun setup() {
         target = object : TargetPredicate {
-            override val x: Int = -1
-            override val y: Int = -1
+            override val x: Int = targetDistance
+            override val y: Int = targetDistance
 
-            override fun reached(x: Int, y: Int, z: Int) = false
+            override fun reached(x: Int, y: Int, z: Int) = x == targetDistance && y == targetDistance
 
-            override fun distance(x: Int, y: Int, z: Int) = -1
+            override fun distance(x: Int, y: Int, z: Int): Int {
+                val deltaX = when {
+                    targetDistance > x -> targetDistance - x
+                    targetDistance + 1 <= x -> x - (targetDistance + 1) + 1
+                    else -> 0
+                }
+                val deltaY = when {
+                    targetDistance > y -> targetDistance - y
+                    targetDistance + 1 <= y -> y - (targetDistance + 1) + 1
+                    else -> 0
+                }
+                return deltaX * deltaX + deltaY * deltaY
+            }
         }
 
-        val data = BreadthFirstSearchBenchmark::class.java.getResourceAsStream("/test$test.dat").readAllBytes()
+        val data = BreadthFirstSearchFindBenchmark::class.java.getResourceAsStream("/test$test.dat").readAllBytes()
         collisionData = BitSet(size * size)
         for (x in 0 until size) {
             for (y in 0 until size) {
@@ -64,41 +82,16 @@ class BreadthFirstSearchBenchmark {
     }
 
     @Benchmark
-    fun search(): Int {
-        return bfs.search(target, 0, 0, -1)
-    }
-
-    @Benchmark
-    fun searchInside(): Int {
-        return bfs.searchInside(target, 0, 0, -1)
-    }
-
-    @Benchmark
-    fun searchPartial(bh: Blackhole) {
-        bh.consume(bfs.search(target, 0, 0, -1))
-        bh.consume(bfs.searchPartial(target, -1, 10))
-    }
-
-    companion object {
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            repeat(6) {
-                createMap(it)
-            }
+    fun find(bh: Blackhole) {
+        bfs.find(target, 0, 0, -1, maxPathLength) {
+            bh.consume(it)
         }
+    }
 
-        private fun createMap(index: Int) {
-            val percent = index / 10.0
-            val file = File("./src/jmh/resources/test$index.dat")
-            val size = 128
-            val array = ByteArray(size * size)
-            for (x in 0 until size) {
-                for (y in 0 until size) {
-                    array[x + (y * size)] = if (Random.nextDouble() < percent) 1 else 0
-                }
-            }
-            file.writeBytes(array)
+    @Benchmark
+    fun findPartial(bh: Blackhole) {
+        bfs.findPartial(target, 0, 0, -1, maxPathLength) {
+            bh.consume(it)
         }
     }
 }

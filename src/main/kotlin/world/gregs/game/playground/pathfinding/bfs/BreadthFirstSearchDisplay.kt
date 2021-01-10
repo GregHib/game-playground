@@ -23,9 +23,12 @@ class BreadthFirstSearchView : View("Breadth first search") {
         override fun blocked(fromX: Int, fromY: Int, toX: Int, toY: Int, direction: Int, z: Int): Boolean {
             return root.grid.get(toX, toY) ?: false
         }
+        override fun blocked(from: Int, to: Int, direction: Int, z: Int): Boolean {
+            return false//root.grid.get(toX, toY) ?: false
+        }
     }
 
-    private val bfs = UnsafeBreadthFirstSearch(collisions, UnsafeBreadthFirstSearch.getUnsafe(), 8, 8)
+    private val bfs = UnsafeBreadthFirstSearch(collisions, 8, 8)
 
     override val root = grid(8, 8, PADDING, PADDING) {
         prefWidth = boundary.width + PADDING

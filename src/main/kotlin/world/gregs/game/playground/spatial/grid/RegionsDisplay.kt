@@ -6,7 +6,7 @@ import tornadofx.View
 import tornadofx.launch
 import world.gregs.game.playground.Direction
 import world.gregs.game.playground.Node
-import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearch
+import world.gregs.game.playground.pathfinding.bfs.BreadthFirstSearchOld
 import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.grid
 import java.awt.Rectangle
@@ -23,7 +23,7 @@ class RegionGroupingView : View("Region grouping") {
         const val PADDING = 100.0
     }
 
-    private val bfs = BreadthFirstSearch(Direction.cardinal)
+    private val bfs = BreadthFirstSearchOld(Direction.cardinal)
     var regionCount = 0
     val colours = mutableMapOf<Int, Color>()
 

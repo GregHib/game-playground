@@ -35,12 +35,12 @@ class GridDimensionBenchmark {
         readY = Random.nextInt(0, size - 1)
     }
 
-    @Benchmark
+//    @Benchmark
     fun benchmarkMulti(): Byte {
         return multiGrid[readX][readY]
     }
 
-    @Benchmark
+//    @Benchmark
     fun benchmark(): Byte {
         return grid[readX + readY * size]
     }

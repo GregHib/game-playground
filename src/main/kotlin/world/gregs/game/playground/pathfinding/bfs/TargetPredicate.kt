@@ -1,6 +1,10 @@
 package world.gregs.game.playground.pathfinding.bfs
 
 interface TargetPredicate {
+    val x: Int
+
+    val y: Int
+
     /**
      * Check if point [x], [y] is close enough to interact with the target
      */

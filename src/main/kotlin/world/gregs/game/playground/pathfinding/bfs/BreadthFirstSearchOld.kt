@@ -10,7 +10,7 @@ import java.awt.Rectangle
 import java.util.*
 import kotlin.system.measureNanoTime
 
-class BreadthFirstSearch(private val directions: Array<Direction>) {
+class BreadthFirstSearchOld(private val directions: Array<Direction>) {
 
     fun displaySearch(canvas: GridCanvas<*, *>, start: Node) {
         val distances = searchNOptimised(canvas.grid, start)

@@ -6,45 +6,52 @@ class UnsafeIntArray(
     private val unsafe: Unsafe,
     private val length: Int
 ) {
-    private val bytes = length * 4L
-    private val address = unsafe.allocateMemory(bytes)
-    private val resetAddress = unsafe.allocateMemory(bytes + 4L)
+    private val address = unsafe.allocateMemory(index(length))
+    private var default: Int = -1
 
-    private fun offset(value: Int): Long = value * 4L
+    private fun index(value: Int): Long = value * 4L
 
+    /**
+     * Set value at [index]
+     * @throws [IndexOutOfBoundsException] if out of bounds
+     */
     operator fun set(index: Int, value: Int) {
-        if (index >= length || index < 0) {
+        if (index < 0 || index >= length) {
             throw IndexOutOfBoundsException("Index $index is not within bounds: $length.")
         }
-        unsafe.putInt(address + offset(index), value)
+        unsafe.putInt(address + index(index), value)
     }
 
+    /**
+     * Get value stored at [index] or [default] if out of bounds
+     */
     operator fun get(index: Int): Int {
-        if (index >= length || index < 0) {
-            return unsafe.getInt(resetAddress + bytes)
+        if (index < 0 || index >= length) {
+            return default
         }
-        return unsafe.getInt(address + offset(index))
+        return unsafe.getInt(address + index(index))
     }
 
-    fun setDefault(value: Int) {
+    /**
+     * Fills the array with [value]
+     */
+    fun fill(value: Int) {
         repeat(length) {
-            setDefault(it, value)
+            unsafe.putInt(address + index(it), value)
         }
     }
 
-    fun setOutOfBounds(value: Int) {
-        unsafe.putInt(resetAddress + bytes, value)
+    /**
+     * Set the default value to return when out of bounds
+     */
+    fun setDefault(value: Int) {
+        default = value
     }
 
-    internal fun setDefault(index: Int, value: Int) {
-        unsafe.putInt(resetAddress + index * 4L, value)
-    }
-
-    fun reset() {
-        unsafe.copyMemory(resetAddress, address, bytes)
-    }
-
-    fun clear() {
+    /**
+     * Frees allocated memory
+     */
+    fun free() {
         unsafe.freeMemory(address)
     }
 
