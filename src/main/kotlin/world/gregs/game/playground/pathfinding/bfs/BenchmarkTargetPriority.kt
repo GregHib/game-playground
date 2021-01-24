@@ -1,12 +1,16 @@
 package world.gregs.game.playground.pathfinding.bfs
 
+import it.unimi.dsi.fastutil.ints.IntArrayPriorityQueue
+import it.unimi.dsi.fastutil.ints.IntHeapPriorityQueue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import world.gregs.game.playground.euclidean
 import java.io.File
+import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
-object Benchmark {
+object BenchmarkTargetPriority {
     @JvmStatic
     fun main(args: Array<String>) {
         val columns = 128
@@ -21,12 +25,15 @@ object Benchmark {
         val startX = 64
         val startY = 64
 
+        val targetX = 127
+        val targetY = 127
+
         collision[startX][startY] = false
 
-        val queue = IntArray(columns * rows) { -1 }
-
-        var writeIndex = 0
-        var readIndex = 0
+        /*
+            Best first search, expands nodes by manhattan distance
+         */
+        val queue = IntHeapPriorityQueue(columns * rows)
 
         fun randomise() {
             for (x in 0 until columns) {
@@ -36,34 +43,39 @@ object Benchmark {
             }
         }
 
-        fun hash(x: Int, y: Int) = y or (x shl 16)
+        fun manhattan(x1: Int, y1: Int, x2: Int, y2: Int) = abs(x1 - x2) + abs(y1 - y2)
 
-        fun getX(hash: Int) = hash shr 16
+        fun pack(distance: Int, x: Int, y: Int) = y or (x shl 12) or (distance shl 24)
 
-        fun getY(hash: Int) = hash and 0xffff
+        fun getDistance(hash: Int) = hash shr 24 and 0xff
+
+        fun getX(hash: Int) = hash shr 12 and 0xfff
+
+        fun getY(hash: Int) = hash and 0xfff
 
         fun reset() {
             distances.fill(-1)
-            writeIndex = 0
-            readIndex = 0
-            queue[writeIndex++] = hash(startX, startY)
+            queue.enqueue(pack(manhattan(startX, startY, targetX, targetY), startX, startY))
             distances[index(startX, startY)] = 0
         }
 
         fun check(parentX: Int, parentY: Int, x: Int, y: Int) {
             if (collision.getOrNull(parentX + x)?.getOrNull(parentY + y) == false && distances[index(parentX + x, parentY + y)] == -1) {
                 distances[index(parentX + x, parentY + y)] = distances[index(parentX, parentY)] + 1
-                queue[writeIndex++] = hash(parentX + x, parentY + y)
+                queue.enqueue(pack(manhattan(parentX + x, parentY + y, targetX, targetY), parentX + x, parentY + y))
             }
         }
 
         fun bfs(): Long {
             return measureNanoTime {
                 reset()
-                while (readIndex < writeIndex) {
-                    val parent = queue[readIndex++]
+                while (!queue.isEmpty) {
+                    val parent = queue.dequeueInt()
                     val parentX = getX(parent)
                     val parentY = getY(parent)
+                    if (parentX == targetX && parentY == targetY) {
+                        break
+                    }
                     check(parentX, parentY, -1, 0)
                     check(parentX, parentY, 1, 0)
                     check(parentX, parentY, 0, -1)

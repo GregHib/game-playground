@@ -6,7 +6,7 @@ import java.io.File
 import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
-object Benchmark {
+object BenchmarkTarget {
     @JvmStatic
     fun main(args: Array<String>) {
         val columns = 128
@@ -20,6 +20,9 @@ object Benchmark {
 
         val startX = 64
         val startY = 64
+
+        val targetX = 127
+        val targetY = 127
 
         collision[startX][startY] = false
 
@@ -64,6 +67,9 @@ object Benchmark {
                     val parent = queue[readIndex++]
                     val parentX = getX(parent)
                     val parentY = getY(parent)
+                    if (parentX == targetX && parentY == targetY) {
+                        break
+                    }
                     check(parentX, parentY, -1, 0)
                     check(parentX, parentY, 1, 0)
                     check(parentX, parentY, 0, -1)

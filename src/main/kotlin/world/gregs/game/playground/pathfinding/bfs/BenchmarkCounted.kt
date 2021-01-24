@@ -6,14 +6,22 @@ import java.io.File
 import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
-object Benchmark {
+object BenchmarkCounted {
     @JvmStatic
     fun main(args: Array<String>) {
         val columns = 128
         val rows = 128
         val percent = 0.0
         val data = File("C:\\Users\\Greg\\IdeaProjects\\game-playground\\benchmarks\\src\\jmh\\resources\\test2.dat").readBytes()
-        val distances = IntArray(columns * rows) { -1 }
+
+        /*
+            This impl keeps track of whether a tile has been visited this turn and packs it in with the distance value
+            This means the distance value for the frontier doesn't have to be reset before each call,
+            on a map of this size it only makes a 1% improvement, but it'd have a bigger impact on larger maps
+         */
+        fun pack(x: Int, y: Int) = y or (x shl 16)
+
+        val frontier = IntArray(columns * rows) { pack(0, 0) }
         val collision = Array(columns) { x -> Array(rows) { y -> data[x + (y * rows)] == 1.toByte() } }
 
         fun index(x: Int, y: Int) = x + (y * columns)
@@ -27,6 +35,7 @@ object Benchmark {
 
         var writeIndex = 0
         var readIndex = 0
+        var visit = 0
 
         fun randomise() {
             for (x in 0 until columns) {
@@ -36,24 +45,26 @@ object Benchmark {
             }
         }
 
-        fun hash(x: Int, y: Int) = y or (x shl 16)
+        fun getX(value: Int) = value shr 16
 
-        fun getX(hash: Int) = hash shr 16
+        fun getDistance(value: Int) = getX(value)
 
-        fun getY(hash: Int) = hash and 0xffff
+        fun getY(value: Int) = value and 0xffff
+
+        fun getVisit(value: Int) = getY(value)
 
         fun reset() {
-            distances.fill(-1)
+            visit++
             writeIndex = 0
             readIndex = 0
-            queue[writeIndex++] = hash(startX, startY)
-            distances[index(startX, startY)] = 0
+            queue[writeIndex++] = pack(startX, startY)
+            frontier[index(startX, startY)] = pack(0, visit)
         }
 
         fun check(parentX: Int, parentY: Int, x: Int, y: Int) {
-            if (collision.getOrNull(parentX + x)?.getOrNull(parentY + y) == false && distances[index(parentX + x, parentY + y)] == -1) {
-                distances[index(parentX + x, parentY + y)] = distances[index(parentX, parentY)] + 1
-                queue[writeIndex++] = hash(parentX + x, parentY + y)
+            if (collision.getOrNull(parentX + x)?.getOrNull(parentY + y) == false && getVisit(frontier[index(parentX + x, parentY + y)]) != visit) {
+                frontier[index(parentX + x, parentY + y)] = pack(getDistance(frontier[index(parentX, parentY)]) + 1, visit)
+                queue[writeIndex++] = pack(parentX + x, parentY + y)
             }
         }
 
@@ -81,7 +92,7 @@ object Benchmark {
 
         for (y in columns - 1 downTo 0) {
             for (x in 0 until rows) {
-                val distance = if (distances[index(x, y)] != -1) distances[index(x, y)] else 0
+                val distance = if (getY(frontier[index(x, y)]) == visit) getX(frontier[index(x, y)]) else 0
                 print("$distance${if (distance in 0..9) " " else ""} ")
             }
             println()
@@ -103,6 +114,7 @@ object Benchmark {
             total += bfs()
         }
         println("BFS took $total avg ${total / times}")
+        println(visit)
 //        BFS took 6134588500 avg 613458
     }
 }

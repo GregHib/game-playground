@@ -17,7 +17,7 @@ class UnsafeBreadthFirstSearch(
 
     private var visited = 1
     private val queue: UnsafeFifoCircularQueue
-    private val frontier: Unsafe2DIntArray
+    val frontier: Unsafe2DIntArray
 
     init {
         assert(width <= 0xffff) { "Width cannot exceed 65535" }
@@ -258,6 +258,15 @@ class UnsafeBreadthFirstSearch(
         frontier.free()
     }
 
+    fun printDist() {
+        for (y in height - 1 downTo 0) {
+            for (x in 0 until width) {
+                val distance = if (visited(x, y)) getDistance(x, y) else 0
+                print("$distance${if (distance in 0..9) " " else ""} ")
+            }
+            println()
+        }
+    }
     companion object {
 
         fun hash(x: Int, y: Int) = y or (x shl 16)
