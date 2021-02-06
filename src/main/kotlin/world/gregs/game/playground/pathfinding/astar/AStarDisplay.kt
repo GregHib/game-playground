@@ -36,7 +36,6 @@ import java.awt.Rectangle
 class AStarView : View("AStar") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
         const val COLUMNS = 32
         const val ROWS = 32
@@ -74,12 +73,12 @@ class AStarView : View("AStar") {
      * Renders all tiles
      */
     private fun showGrid() {
-        val w = boundary.width / grid.columns
-        val h = boundary.height / grid.rows
+        val w = root.width / grid.columns
+        val h = root.height / grid.rows
         for (x in grid.colIndices) {
             for (y in grid.rowIndices) {
                 val cell = grid.get(x, y)
-                content.rectangle(x * w, boundary.height - ((y + 1) * h), w, h) {
+                content.rectangle(x * w, root.height - ((y + 1) * h), w, h) {
                     fill = if (cell?.wall == true) Color.BLACK else Color.WHITE
                     stroke = Color.BLACK
                 }
@@ -87,28 +86,28 @@ class AStarView : View("AStar") {
         }
 
         for (closed in aStar.closedSet) {
-            content.rectangle(closed.x * w, boundary.height - ((closed.y + 1) * h) + (h / 2), w / 2, h / 2) {
+            content.rectangle(closed.x * w, root.height - ((closed.y + 1) * h) + (h / 2), w / 2, h / 2) {
                 fill = Color.RED
                 stroke = Color.BLACK
             }
         }
 
         for (open in aStar.openSet) {
-            content.rectangle(open.x * w + (w / 2), boundary.height - ((open.y + 1) * h) + (h / 2), w / 2, h / 2) {
+            content.rectangle(open.x * w + (w / 2), root.height - ((open.y + 1) * h) + (h / 2), w / 2, h / 2) {
                 fill = Color.ORANGE
                 stroke = Color.BLACK
             }
         }
 
         result?.path()?.forEach { step ->
-            content.rectangle(step.x * w, boundary.height - ((step.y + 1) * h), w / 2, h / 2) {
+            content.rectangle(step.x * w, root.height - ((step.y + 1) * h), w / 2, h / 2) {
                 fill = Color.GREEN
                 stroke = Color.BLACK
             }
         }
 
         for (step in aStar.path) {
-            content.rectangle(step.x * w + (w / 2), boundary.height - ((step.y + 1) * h), w / 2, h / 2) {
+            content.rectangle(step.x * w + (w / 2), root.height - ((step.y + 1) * h), w / 2, h / 2) {
                 fill = Color.BLUE
                 stroke = Color.BLACK
             }
@@ -127,11 +126,8 @@ class AStarView : View("AStar") {
         PADDING,
         PADDING, 1.0, 10.0
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
         this@AStarView.content = content
-
-        reload()
+        reloadGrid()
 
         setOnMouseClicked {
             aStar.reset()
@@ -180,6 +176,10 @@ class AStarView : View("AStar") {
                 reload()
             }
         }
+    }
+
+    init {
+        reload()
     }
 }
 

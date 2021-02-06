@@ -14,12 +14,10 @@ import java.util.*
 /**
  * Minimum spanning tree algorithm for sparse objects
  * For dense graphs use Prim's instead
- *
  */
 class KruskalsView : View("Kruskals algorithm") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -28,10 +26,6 @@ class KruskalsView : View("Kruskals algorithm") {
         PADDING,
         PADDING
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
 
         fun randomise() {
             grid.fillRandom(0.01)

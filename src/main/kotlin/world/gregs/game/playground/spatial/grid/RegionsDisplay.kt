@@ -19,7 +19,6 @@ import kotlin.random.Random
 class RegionGroupingView : View("Region grouping") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -31,17 +30,12 @@ class RegionGroupingView : View("Region grouping") {
         PADDING,
         PADDING
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
         val cluster = Array(columns) { Array(rows) { -1 } }
-
 
         fun randomise() {
             grid.fillRandom(0.3)
             colours.clear()
-            regionCount = 0
+            regionCount = 1
             cluster.forEach { Arrays.fill(it, -1) }
             val t1 = System.currentTimeMillis()
             for(x in 0 until grid.columns) {

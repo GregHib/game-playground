@@ -15,7 +15,6 @@ import java.util.*
 class DistancesView : View("PH-tree") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
         const val CLUSTER_SIZE = 4
     }
@@ -23,10 +22,6 @@ class DistancesView : View("PH-tree") {
     private val pht = PhTree13<Boolean>(2)
 
     override val root = grid(16, 16, PADDING, PADDING) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
         val distances = Array(columns) { Array(rows) { -1 } }
 
         fun randomise() {
@@ -59,13 +54,13 @@ class DistancesView : View("PH-tree") {
             //Draw clusters
             val w = CLUSTER_SIZE * tileWidth
             val h = CLUSTER_SIZE * tileHeight
-            for (x in w until boundary.width step w) {
-                content.line(x, 0, x, boundary.height) {
+            for (x in w until width step w) {
+                content.line(x, 0, x, height) {
                     stroke = Color.ORANGE
                 }
             }
-            for (y in h until boundary.height step h) {
-                content.line(0, y, boundary.width, y) {
+            for (y in h until height step h) {
+                content.line(0, y, width, y) {
                     stroke = Color.ORANGE
                 }
             }

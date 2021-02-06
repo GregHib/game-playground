@@ -16,7 +16,6 @@ import java.awt.Rectangle
 class ValueIterationView : View("Value iteration view") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -31,10 +30,6 @@ class ValueIterationView : View("Value iteration view") {
         PADDING, PADDING,
         1.0, 10.0
     ){
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
         this@ValueIterationView.content = content
 
         updateSize()

@@ -14,7 +14,6 @@ import kotlin.random.Random
 class BreadthFirstSearchView : View("Breadth first search") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -22,10 +21,6 @@ class BreadthFirstSearchView : View("Breadth first search") {
     private val bfs = BreadthFirstSearch(Direction.values())
 
     override val root = grid(16, 16, PADDING, PADDING) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
 
         fun randomise() {
             grid.fillRandom(0.3)

@@ -13,10 +13,12 @@ import world.gregs.game.playground.Grid
 
 class GridCanvas<T : Any, G : Grid<T>>(
     val grid: G,
-    paddingX: Double,
-    paddingY: Double,
+    private val paddingX: Double,
+    private val paddingY: Double,
     minZoom: Double,
-    maxZoom: Double
+    maxZoom: Double,
+    var tileWidth: Int = 32,
+    var tileHeight: Int = 32
 ) : ZoomCanvas(paddingX, paddingY, minZoom, maxZoom) {
 
     val columns: Int = grid.columns
@@ -28,8 +30,6 @@ class GridCanvas<T : Any, G : Grid<T>>(
 
     var width: Int = 0
     var height: Int = 0
-    var tileWidth: Int = 0
-    var tileHeight: Int = 0
 
     val MouseEvent.gridX: Int
         get() = (x / tileWidth).toInt()
@@ -38,10 +38,11 @@ class GridCanvas<T : Any, G : Grid<T>>(
         get() = (yToGrid(y) / tileHeight).toInt()
 
     fun updateSize() {
-        width = content.prefWidth.toInt()
-        height = content.prefHeight.toInt()
-        tileWidth = width / columns
-        tileHeight = height / rows
+        width = columns * tileWidth
+        height = rows * tileHeight
+
+        prefWidth = width.toDouble() + paddingX
+        prefHeight = height.toDouble() + paddingY
     }
 
     fun reloadGrid() {

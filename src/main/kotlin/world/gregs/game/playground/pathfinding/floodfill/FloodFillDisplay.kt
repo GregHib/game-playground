@@ -15,7 +15,6 @@ import kotlin.random.Random
 class FloodFillView : View("Flood fill") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -23,10 +22,6 @@ class FloodFillView : View("Flood fill") {
     private val bfs = BreadthFirstSearch(Direction.values())
 
     override val root = grid(16, 16, PADDING, PADDING) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
 
         fun randomise() {
             grid.fillRandom(0.3)

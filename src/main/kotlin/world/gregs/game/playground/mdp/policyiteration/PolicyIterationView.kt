@@ -16,7 +16,6 @@ import java.awt.Rectangle
 class PolicyIterationView : View("Policy iteration view") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -34,10 +33,6 @@ class PolicyIterationView : View("Policy iteration view") {
         PADDING, PADDING,
         1.0, 10.0
     ){
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
         this@PolicyIterationView.content = content
 
         updateSize()

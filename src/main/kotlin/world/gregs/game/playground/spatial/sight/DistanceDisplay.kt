@@ -16,7 +16,6 @@ import java.awt.Rectangle
 class DistanceView : View("Distance view") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -44,11 +43,6 @@ class DistanceView : View("Distance view") {
         PADDING,
         PADDING
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
-
         fun reload() {
             reloadGrid()
             tile(sourceX, sourceY, sourceWidth, sourceHeight) {

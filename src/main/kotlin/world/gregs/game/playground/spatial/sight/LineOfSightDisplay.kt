@@ -19,7 +19,6 @@ import java.awt.Rectangle
 class LineOfSightView : View("Line of sight view") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
         const val VIEW_DISTANCE = 8
     }
@@ -27,15 +26,10 @@ class LineOfSightView : View("Line of sight view") {
     private val visibleTiles = mutableListOf<Pair<Int, Int>>()
 
     override val root = grid(
-        32, 32,
+        25, 25,
         PADDING,
         PADDING
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
-
         val los = LineOfSight(grid)
 
         fun updateLOS(startX: Int, startY: Int, range: Int) {

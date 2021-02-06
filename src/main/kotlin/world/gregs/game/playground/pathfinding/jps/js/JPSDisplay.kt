@@ -19,7 +19,6 @@ import java.awt.Rectangle
 class JPSView : View("JPS") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
         const val COLUMNS = 32
         const val ROWS = 32
@@ -35,12 +34,7 @@ class JPSView : View("JPS") {
         PADDING,
         PADDING
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
         this@JPSView.content = content
-
 
         fun randomise() {
             grid.fillRandom(WALL_PERCENT)

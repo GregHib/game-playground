@@ -26,10 +26,9 @@ import kotlin.system.measureNanoTime
 class HierarchicalAStarView : View("HierarchicalAStar") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
-        const val COLUMNS = 64
-        const val ROWS = 64
+        const val COLUMNS = 32
+        const val ROWS = 32
         const val CLUSTER_SIZE = 8
         const val WALL_PERCENT = 0.3
     }
@@ -118,13 +117,13 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
     private fun showClusters() {
         val w = CLUSTER_SIZE * root.tileWidth
         val h = CLUSTER_SIZE * root.tileHeight
-        for (x in w until boundary.width step w) {
-            content.line(x, 0, x, boundary.height) {
+        for (x in w until root.width step w) {
+            content.line(x, 0, x, root.height) {
                 stroke = Color.ORANGE
             }
         }
-        for (y in h until boundary.height step h) {
-            content.line(0, y, boundary.width, y) {
+        for (y in h until root.height step h) {
+            content.line(0, y, root.width, y) {
                 stroke = Color.ORANGE
             }
         }
@@ -274,12 +273,8 @@ class HierarchicalAStarView : View("HierarchicalAStar") {
         PADDING,
         PADDING, 1.0, 10.0
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
         this@HierarchicalAStarView.content = content
-
+        updateSize()
 
         content.setOnMouseClicked {
             println("Clicked ${it.gridX} ${it.gridY}")

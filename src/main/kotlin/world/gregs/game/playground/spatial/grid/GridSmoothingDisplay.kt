@@ -10,12 +10,11 @@ import java.awt.Rectangle
 
 /**
  * Smooths tiles to create dungeon esq maps
- * Click to smooth (1-5 before scrambling again)
+ * Click to smooth (1-10 before scrambling again)
  */
 class GridSmoothingView : View("Grid smoothing") {
 
     companion object {
-        private val boundary = Rectangle(0, 0, 512, 512)
         const val PADDING = 100.0
     }
 
@@ -26,11 +25,6 @@ class GridSmoothingView : View("Grid smoothing") {
         PADDING,
         PADDING
     ) {
-        prefWidth = boundary.width + PADDING
-        prefHeight = boundary.height + PADDING
-        content.prefWidth = boundary.width.toDouble()
-        content.prefHeight = boundary.height.toDouble()
-
 
         fun smooth() {
             val t1 = System.currentTimeMillis()
@@ -58,7 +52,7 @@ class GridSmoothingView : View("Grid smoothing") {
         reload()
 
         content.setOnMouseClicked {
-            if (smoothingLevel > 5) {
+            if (smoothingLevel > 10) {
                 randomise()
                 smoothingLevel = 0
             }
