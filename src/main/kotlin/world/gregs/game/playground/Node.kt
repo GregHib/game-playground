@@ -4,7 +4,7 @@ import kotlin.math.abs
 
 open class Node(val x: Int, val y: Int) {
 
-    val pos = y + (x shl 14)// + (plane shl 28)
+    val pos = y + (x shl 14)
 
     fun delta(v: Node): Node {
         return Node(abs(this.x - v.x), abs(this.y - v.y))

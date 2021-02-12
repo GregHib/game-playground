@@ -27,6 +27,10 @@ Different pre-processing method used
 
 ![](./src/main/resources/images/BreadthFirstSearch.png)
 
+### Dijkstra's Algorithm
+
+![](./src/main/resources/images/Dijkstra'sAlgorithm.png)
+
 #### Bidirectional
 
 ![](./src/main/resources/images/BidirectionalBreadthFirstSearch.png)
