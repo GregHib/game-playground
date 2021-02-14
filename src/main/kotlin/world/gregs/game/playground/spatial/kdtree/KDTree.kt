@@ -1,108 +1,80 @@
 package world.gregs.game.playground.spatial.kdtree
 
 import java.awt.Point
+import kotlin.math.abs
 
 class KDTree(points: List<Point>, depth: Int = 0) {
 
-    data class KDNode(val point: Point, val left: KDNode?, val right: KDNode?)
-
-    private fun build(points: List<Point>, depth: Int): KDNode? {
-
-        if (points.isNotEmpty()) {
-            val axis = depth % 2
-
-            val sortedPoints = points.sortedBy { it[axis] }
-            val size = points.size
-            return KDNode(
-                sortedPoints[size / 2],
-                build(sortedPoints.subList(0, size / 2), depth + 1),
-                build(sortedPoints.subList(size / 2 + 1, size), depth + 1)
-            )
-        }
-        return null
-    }
-
+    private val children: IntArray = IntArray(points.size * 2)
+    val elements: Array<Point?> = arrayOfNulls(points.size)
+    private var index: Int = 0
     val root = build(points, depth)
 
-    fun naiveClosestPoint(root: KDNode?, point: Point, depth: Int = 0, best: Point? = null): Point? {
-        if (root == null) {
-            return best
+    private fun build(points: List<Point>, depth: Int): Int {
+        if (points.isEmpty()) {
+            return -1
         }
-
         val axis = depth % 2
-
-        val nextBest: Point = if (best == null || point.distance(best) > point.distance(root.point)) {
-            root.point
-        } else {
-            best
-        }
-        val nextBranch = if (point[axis] < root.point[axis]) {
-            root.left
-        } else {
-            root.right
-        }
-
-        return naiveClosestPoint(nextBranch, point, depth + 1, nextBest)
+        val sortedPoints = points.sortedBy { it[axis] }
+        val size = points.size
+        val eleIndex = index
+        elements[index++] = sortedPoints[size / 2]
+        children[2 * eleIndex] = build(sortedPoints.subList(0, size / 2), depth + 1)
+        children[2 * eleIndex + 1] = build(sortedPoints.subList(size / 2 + 1, size), depth + 1)
+        return eleIndex
     }
 
-    private fun closerDistance(pivot: Point, p1: Point?, p2: Point?): Point? {
-        if(p1 == null) {
-            return p2
-        }
-        if(p2 == null) {
-            return p1
-        }
+    fun node(index: Int) = elements[index]
 
-        val d1 = pivot.distance(p1)
-        val d2 = pivot.distance(p2)
+    fun leftIndex(index: Int) = children[2 * index]
 
-        return if(d1 < d2) {
-            p1
-        } else {
-            p2
-        }
-    }
+    fun rightIndex(index: Int) = children[2 * index + 1]
 
-    @Suppress("NAME_SHADOWING")
-    fun closestPoint(point: Point, root: KDNode? = this.root, depth: Int = 0): Point? {
-        if (root == null) {
+    fun nearest(target: Point, index: Int = this.root, depth: Int = 0): Point? {
+        if (index == -1) {
             return null
         }
 
-        val axis = depth % 2
-        val oppositeBranch: KDNode?
-        val nextBranch: KDNode?
+        val parent = node(index) ?: return null
+        val axis = depth.rem(2)
+        val oppositeBranch: Int
+        val nextBranch: Int
 
-        if(point[axis] < root.point[axis]) {
-            oppositeBranch = root.left
-            nextBranch = root.right
+        if (target[axis] < parent[axis]) {
+            oppositeBranch = rightIndex(index)
+            nextBranch = leftIndex(index)
         } else {
-            oppositeBranch = root.right
-            nextBranch = root.left
+            oppositeBranch = leftIndex(index)
+            nextBranch = rightIndex(index)
         }
 
-        val best = closerDistance(point, closestPoint(point, nextBranch, depth + 1), root.point)
-
-        if(point.distance(best) > kotlin.math.abs(point[axis] - root.point[axis])) {
-            return closerDistance(point, closestPoint(point, oppositeBranch, depth + 1), best)
+        val best = closest(target, nearest(target, nextBranch, depth + 1), parent)
+        if (distance(target, best) > abs(target[axis] - parent[axis])) {
+            return closest(target, nearest(target, oppositeBranch, depth + 1), best)
         }
         return best
     }
 
-    fun closestPoint(points: List<Point>, to: Point): Point? {
-        var bestDistance = -1.0
-        var bestPoint: Point? = null
-        points.forEach { point ->
-            val distance = point.distance(to)
-            if (distance > bestDistance) {
-                bestDistance = distance
-                bestPoint = point
-            }
+    private fun closest(target: Point, p1: Point?, p2: Point?): Point? {
+        if (p1 == null) {
+            return p2
         }
-        return bestPoint
-    }
-}
 
-private operator fun Point.get(axis: Int): Int {
-    return if (axis == 0) x else y
+        if (p2 == null) {
+            return p1
+        }
+
+        val d1 = distance(target, p1)
+        val d2 = distance(target, p2)
+
+        return if (d1 < d2) p1 else p2
+    }
+
+    private operator fun Point.get(axis: Int): Int {
+        return if (axis == 0) x else y
+    }
+
+    private fun distance(first: Point, second: Point?): Double {
+        return first.distance(second)
+    }
 }
