@@ -52,8 +52,8 @@ class FloodFillView : View("Flood fill") {
     }
 }
 
-class FloodFillApp : App(FloodFillView::class, QuadTreeStyles::class)
+class FloodFillApp : App(DistanceFloodFillView::class, QuadTreeStyles::class)
 
 fun main(args: Array<String>) {
-    launch<FloodFillApp>(*args)
+    launch<DistanceFloodFillApp>(*args)
 }

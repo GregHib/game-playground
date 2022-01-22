@@ -24,6 +24,7 @@ dependencies {
     implementation("org.jgrapht:jgrapht-ext:1.5.0")
     implementation("it.unimi.dsi:fastutil:8.4.3")
     implementation("es.usc.citius.hipster:hipster-all:1.0.1")
+    implementation("de.alsclo:voronoi-java:1.0")
     implementation(group = "org.apache.commons", name = "commons-math3", version = "3.6")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
@@ -32,7 +33,7 @@ dependencies {
     testImplementation("pl.pragmatists:JUnitParams:1.1.1")
 }
 
-val javafxModules = arrayOf("controls", "fxml", "graphics")
+val javafxModules = arrayOf("controls", "fxml", "graphics", "swing")
 
 javafx {
     modules = javafxModules.map { "javafx.$it" }
