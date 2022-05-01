@@ -7,6 +7,7 @@ import world.gregs.game.playground.spatial.quadtree.QuadTreeStyles
 import world.gregs.game.playground.ui.zoom.zoom
 import java.awt.Point
 import java.awt.Rectangle
+import java.awt.geom.Point2D
 import kotlin.random.Random
 import kotlin.system.measureNanoTime
 
@@ -29,12 +30,31 @@ class KDTreeView : View("KDTree") {
     private var searchPoint = Point(Random.nextInt(boundary.width), Random.nextInt(boundary.height))
 
     var kdTree: KDTree
+    var kdTree2: JavaKdTree
+    var kdTree3: KDTree3<GeoName>
 
     init {
         repeat(POINTS) {
             points.add(Point(Random.nextInt(boundary.width), Random.nextInt(boundary.height)))
         }
         kdTree = KDTree(points)
+        kdTree2 = JavaKdTree()
+        for(point in points) {
+            kdTree2.insert(object : java.awt.geom.Point2D() {
+                override fun getX(): kotlin.Double {
+                    return point.x.toDouble()
+                }
+
+                override fun getY(): kotlin.Double {
+                    return point.y.toDouble()
+                }
+
+                override fun setLocation(x: kotlin.Double, y: kotlin.Double) {
+                }
+
+            })
+        }
+        kdTree3 = KDTree3(points.map { GeoName(it.x, it.y) })
     }
 
     /**
@@ -53,18 +73,73 @@ class KDTreeView : View("KDTree") {
         content.circle(searchPoint.x, boundary.height - searchPoint.y, 3) {
             fill = Color.CYAN
         }
+        val radius = 100
+        val searchArea = Rectangle(searchPoint.x - radius, searchPoint.y - radius, radius * 2, radius * 2)
+        content.rectangle(searchArea.x, boundary.height - (radius * 2 + searchArea.y), searchArea.width, searchArea.height) {
+            stroke = Color.CYAN
+            fill = Color.TRANSPARENT
+        }
 //        content.text("${searchPoint.x}, ${searchPoint.y}") {
 //            x = searchPoint.x.toDouble()
 //            y = boundary.height - searchPoint.y.toDouble()
 //        }
         //Render found nearest neighbour
         var neighbor: Point?
+        var neighbors: List<Point>?
+        println("Search...")
         println("${measureNanoTime {
                 neighbor = kdTree.nearest(searchPoint) 
         }}ns")
+        println("${measureNanoTime {
+                neighbors = kdTree.range(searchArea) 
+        }}ns")
+        println("Neighbours: ${neighbors?.size}")
+        val search = object : java.awt.geom.Point2D() {
+            override fun getX(): kotlin.Double {
+                return searchPoint.x.toDouble()
+            }
+
+            override fun getY(): kotlin.Double {
+                return searchPoint.y.toDouble()
+            }
+
+            override fun setLocation(x: kotlin.Double, y: kotlin.Double) {
+            }
+
+        }
+        var neighbor2: Point2D?
+        println("${measureNanoTime {
+                neighbor2 = kdTree2.nearest(search) 
+        }}ns")
+        var neighbor3: GeoName?
+        val search3 = GeoName(searchPoint.x, searchPoint.y)
+        println("${measureNanoTime {
+                neighbor3 = kdTree3.findNearest(search3) 
+        }}ns")
+
+
         if (neighbor != null) {
             content.circle(neighbor!!.x, boundary.height - neighbor!!.y, 3) {
                 fill = Color.LIMEGREEN
+            }
+        }
+        if (neighbor2 != null) {
+//            content.circle(neighbor2!!.x, boundary.height - neighbor2!!.y, 3) {
+//                fill = Color.DARKGREEN
+//            }
+        }
+        println(neighbor)
+        println("${neighbor3?.x} ${neighbor3?.y}")
+        if (neighbor3 != null) {
+            content.circle(neighbor3!!.x, boundary.height - neighbor3!!.y, 3) {
+                fill = Color.RED
+            }
+        }
+        if (neighbors != null) {
+            for(neighbour in neighbors!!) {
+                content.circle(neighbour.x, boundary.height - neighbour.y, 3) {
+                    fill = Color.ORANGE
+                }
             }
         }
     }
