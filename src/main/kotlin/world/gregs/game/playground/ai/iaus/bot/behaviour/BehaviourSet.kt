@@ -31,6 +31,7 @@ class BehaviourSet<A, T>(
         return current
     }
 
-    companion object {
+    fun debug(agent: A): List<Choice<A, T>> {
+        return set.flatMap { behaviour -> behaviour.getAllTargets(agent, null) }.filterNotNull()
     }
 }

@@ -45,9 +45,12 @@ interface Behaviour<A, T> : Named {
                 return null
             }
 
+            if (debug) {
+                println("Check target $target")
+            }
             val score = score(agent, target, last)
             if (debug) {
-                println("Check target $target $score")
+                println("Target scored $target $score")
             }
             if (score > highest) {
                 highest = score
@@ -55,5 +58,15 @@ interface Behaviour<A, T> : Named {
             }
         }
         return if (topChoice != null) Choice(topChoice, this, highest) else null
+    }
+
+    /**
+     * Scores all targets
+     */
+    fun getAllTargets(agent: A, last: Behaviour<A, T>?): List<Choice<A, T>?> {
+        return targets(agent).map { target ->
+            val score = score(agent, target, last)
+            Choice(target, this, score)
+        }
     }
 }
