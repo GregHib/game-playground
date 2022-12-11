@@ -14,7 +14,7 @@ data class Area(
     val height: Int,
     val colour: Color,
     override val records: Records = Records(),
-    val behaviours: MutableSet<Behaviour> = mutableSetOf()
+    val behaviours: MutableSet<Behaviour<Agent>> = mutableSetOf()
 ) : Coordinates, Named, Recorder {
     val actors = mutableListOf<Actor>()
 

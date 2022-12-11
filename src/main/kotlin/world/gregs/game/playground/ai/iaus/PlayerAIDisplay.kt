@@ -49,37 +49,37 @@ class PlayerAIView : View("Player AI view") {
 
         setupActionHandlers()
 
-        val distanceTo = consider { agent, obj: Coordinates ->
+        val distanceTo = consider { agent: Agent, obj: Coordinates ->
             chebyshev(agent.x, agent.y, obj.x, obj.y).scale(0.0, maxDistance).inverse()
         }
 
-        val hasSkillToUse = considerBool { agent, obj: GameObject ->
+        val hasSkillToUse = considerBool { agent: Agent, obj: GameObject ->
             val skill: Int = agent[Skill]
             val required: Int = obj[Skill]
             skill >= required
         }
 
-        val skillEfficiency = consider { agent, obj: GameObject ->
+        val skillEfficiency = consider { agent: Agent, obj: GameObject ->
             obj.getDouble(Skill).scale(0.1, agent.getDouble(Skill))
         }
 
-        val hasTooManyLogs = considerBool { agent, _: Any ->
+        val hasTooManyLogs = considerBool { agent: Agent, _: Any ->
             agent.bag.getOrDefault("logs", 0) >= 4
         }
 
-        val hasAxe = considerBool { agent, _: Any ->
+        val hasAxe = considerBool { agent: Agent, _: Any ->
             agent.bag.getOrDefault("axe", 0) > 0
         }
 
-        val hasNoAxe = considerBool { agent, _: Any ->
+        val hasNoAxe = considerBool { agent: Agent, _: Any ->
             agent.bag.getOrDefault("axe", 0) == 0
         }
 
-        val choppingMomentum = consider { agent, _: Any ->
+        val choppingMomentum = consider { agent: Agent, _: Any ->
             agent.getDouble(ChoppingMomentum)
         }
 
-        fun goToArea(predicate: (Area) -> Boolean, considerations: Set<Consideration>): SimpleBehaviour {
+        fun goToArea(predicate: (Area) -> Boolean, considerations: Set<(Agent, Any) -> Double>): SimpleBehaviour {
             return SimpleBehaviour(
                 name = "go to",
                 targets = { areas.filter(predicate) },
