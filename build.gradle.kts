@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "1.4.20"
-    id("org.openjfx.javafxplugin") version "0.0.9"
-    kotlin("kapt") version "1.4.20"
+    kotlin("jvm") version "1.7.20"
+    id("org.openjfx.javafxplugin") version "0.0.13"
+    kotlin("kapt") version "1.7.20"
 }
 
 group = "world.gregs.game.playground"
@@ -16,8 +16,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("no.tornado:tornadofx:2.0.0-SNAPSHOT")
     implementation("ch.ethz.globis.phtree:phtree:2.5.0")
     implementation("org.jgrapht:jgrapht-core:1.5.0")
