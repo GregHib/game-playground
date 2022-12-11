@@ -1,7 +1,6 @@
 package world.gregs.game.playground.ai.iaus.bot.behaviour
 
 import world.gregs.game.playground.ai.iaus.PlayerAIView.Companion.debug
-import world.gregs.game.playground.ai.iaus.world.action.Action
 import world.gregs.game.playground.ai.iaus.bot.Choice
 import world.gregs.game.playground.ai.iaus.world.Named
 
@@ -10,7 +9,6 @@ interface Behaviour<T> : Named {
     val considerations: Set<(T, Any) -> Double>
     val momentum: Double
     val weight: Double
-    val action: Action
 
     /**
      * Combine [weight] with all considerations into one score
