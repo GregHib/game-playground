@@ -3,13 +3,14 @@ package world.gregs.game.playground.ai.iaus.bot
 import world.gregs.game.playground.ai.iaus.bot.behaviour.BehaviourSet
 import world.gregs.game.playground.ai.iaus.bot.behaviour.SimpleBehaviour
 import world.gregs.game.playground.ai.iaus.world.Agent
+import world.gregs.game.playground.ai.iaus.world.Named
 import kotlin.system.measureNanoTime
 
 class Reasoner(private val agent: Agent) {
-    val behaviours = BehaviourSet<Agent>()
+    val behaviours = BehaviourSet<Agent, Named>()
 
     fun tick() {
-        val choice: Choice<Agent>
+        val choice: Choice<Agent, Named>
         val time = measureNanoTime {
             choice = behaviours.select(agent)!!
         }

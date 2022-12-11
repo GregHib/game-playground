@@ -4,9 +4,9 @@ import world.gregs.game.playground.ai.iaus.PlayerAIView.Companion.debug
 import world.gregs.game.playground.ai.iaus.bot.Choice
 import world.gregs.game.playground.ai.iaus.world.Named
 
-interface Behaviour<T> : Named {
-    val targets: (T) -> List<Named>
-    val considerations: Set<(T, Any) -> Double>
+interface Behaviour<A, T> : Named {
+    val targets: (A) -> List<T>
+    val considerations: Set<(A, T) -> Double>
     val momentum: Double
     val weight: Double
 
@@ -14,7 +14,7 @@ interface Behaviour<T> : Named {
      * Combine [weight] with all considerations into one score
      * @return score 0..1 + [momentum]
      */
-    fun score(agent: T, target: Any, last: Behaviour<T>?): Double {
+    fun score(agent: A, target: T, last: Behaviour<A, T>?): Double {
         val compensationFactor = 1.0 - (1.0 / considerations.size)
         var result = weight
         for (consideration in considerations) {
@@ -36,9 +36,9 @@ interface Behaviour<T> : Named {
     /**
      * Selects the target with the highest score greater than [highestScore]
      */
-    fun getHighestTarget(agent: T, highestScore: Double, last: Behaviour<T>?): Choice<T>? {
+    fun getHighestTarget(agent: A, highestScore: Double, last: Behaviour<A, T>?): Choice<A, T>? {
         var highest = highestScore
-        var topChoice: Named? = null
+        var topChoice: T? = null
         val targets = targets(agent)
         for (target in targets) {
             if (highest > weight) {
@@ -47,7 +47,7 @@ interface Behaviour<T> : Named {
 
             val score = score(agent, target, last)
             if (debug) {
-                println("Check target ${target.name} $score")
+                println("Check target $target $score")
             }
             if (score > highest) {
                 highest = score

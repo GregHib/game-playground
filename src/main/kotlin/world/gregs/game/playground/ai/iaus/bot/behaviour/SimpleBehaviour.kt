@@ -11,7 +11,7 @@ data class SimpleBehaviour(
     override val targets: (Agent) -> List<Named> = self,
     override val momentum: Double = 1.25,
     override val weight: Double = 1.0
-) : Behaviour<Agent> {
+) : Behaviour<Agent, Named> {
     companion object {
         val self: (Agent) -> List<Named> = { agent: Agent -> listOf(agent) }
     }
